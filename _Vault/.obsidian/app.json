@@ -1,0 +1,13 @@
+{
+  "useMarkdownLinks": false,
+  "newFileLocation": "current",
+  "attachmentFolderPath": "_assets",
+  "showUnsupportedFiles": false,
+  "defaultViewMode": "source",
+  "foldHeading": true,
+  "foldIndent": true,
+  "showLineNumber": false,
+  "strictLineBreaks": false,
+  "readableLineLength": true,
+  "showFrontmatter": false
+}

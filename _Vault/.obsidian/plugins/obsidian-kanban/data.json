@@ -1,0 +1,17 @@
+{
+  "date-trigger": "@",
+  "time-trigger": "@@",
+  "link-date-to-daily-note": false,
+  "hide-date-in-title": false,
+  "show-checkboxes": true,
+  "new-card-insertion-method": "prepend",
+  "move-dates": true,
+  "archive-with-date": true,
+  "date-display-format": "YYYY-MM-DD",
+  "date-picker-week-start": 1,
+  "prepend-archive-separator": "",
+  "prepend-archive-format": "{{DATE}}",
+  "lane-width": 280,
+  "max-archive-size": -1,
+  "display-tags": true
+}

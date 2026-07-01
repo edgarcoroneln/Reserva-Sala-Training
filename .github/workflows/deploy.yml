@@ -1,0 +1,61 @@
+name: CI/CD — {{PROJECT_NAME}}
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          # Ajusta cache-dependency-path si tienes monorepo:
+          # cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+        # Para monorepo: cd frontend && npm install
+
+      - name: Run tests
+        run: npm test
+        # Para monorepo: cd backend && npm test
+
+      - name: Build
+        run: npm run build
+        # Para monorepo: cd frontend && npm run build
+
+  deploy:
+    name: Deploy
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── Opción A: Firebase Hosting ────────────────────────────────────────
+      # - name: Deploy to Firebase
+      #   uses: FirebaseExtended/action-hosting-deploy@v0
+      #   with:
+      #     repoToken: ${{ secrets.GITHUB_TOKEN }}
+      #     firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      #     channelId: live
+      #     projectId: (tu-firebase-project-id)
+
+      # ── Opción B: Vercel ──────────────────────────────────────────────────
+      # - name: Deploy to Vercel
+      #   run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      # ── Opción C: Railway / Render / Fly.io ───────────────────────────────
+      # Configura según tu plataforma de backend
+
+      - name: Deploy placeholder
+        run: echo "Configura tu deploy en este paso. Ver comentarios arriba."
