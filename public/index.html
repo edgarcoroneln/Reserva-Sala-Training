@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reserva — Sala de Entrenamiento 2C-1</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Sala de Entrenamiento 2C-1</h1>
+      <p class="subtitle">DISW · 2 Patios, CDMX · reserva por bloques (mañana / tarde)</p>
+    </header>
+
+    <main class="layout">
+      <!-- Calendario de disponibilidad -->
+      <section class="card" aria-labelledby="cal-title">
+        <div class="card-head">
+          <h2 id="cal-title">Disponibilidad</h2>
+          <div class="cal-nav">
+            <button type="button" id="prevMonth" aria-label="Mes anterior">‹</button>
+            <span id="monthLabel" class="month-label"></span>
+            <button type="button" id="nextMonth" aria-label="Mes siguiente">›</button>
+          </div>
+        </div>
+        <div id="calendar" class="calendar" aria-live="polite"></div>
+        <div class="legend">
+          <span><i class="dot free"></i> Libre</span>
+          <span><i class="dot busy"></i> Ocupado</span>
+          <span class="muted">AM: <span id="amTime"></span> · PM: <span id="pmTime"></span></span>
+        </div>
+      </section>
+
+      <!-- Formulario de reserva -->
+      <section class="card" aria-labelledby="form-title">
+        <div class="card-head"><h2 id="form-title">Solicitar reserva</h2></div>
+
+        <form id="reservaForm" novalidate>
+          <label>1. Nombre del evento *
+            <input type="text" name="event_name" required maxlength="200" />
+          </label>
+
+          <label>2. Correo de contacto *
+            <input type="email" name="contact_email" required />
+          </label>
+
+          <div class="row">
+            <label>3. Fecha de inicio *
+              <input type="date" name="start_date" id="start_date" required />
+            </label>
+            <label>4. Fecha de fin *
+              <input type="date" name="end_date" id="end_date" required />
+            </label>
+          </div>
+
+          <fieldset>
+            <legend>5. Duración *</legend>
+            <label class="inline"><input type="radio" name="duration_type" value="complete" checked /> Día completo (AM + PM)</label>
+            <label class="inline"><input type="radio" name="duration_type" value="half" /> Medio día</label>
+            <div id="halfBlockWrap" class="hidden">
+              <span class="hint">Elige el bloque (solo reservas de un día):</span>
+              <label class="inline"><input type="radio" name="half_block" value="AM" /> Mañana (AM)</label>
+              <label class="inline"><input type="radio" name="half_block" value="PM" /> Tarde (PM)</label>
+            </div>
+          </fieldset>
+
+          <label>6. Duración total en días
+            <input type="number" name="total_days" id="total_days" readonly />
+            <span class="hint">Se calcula automáticamente a partir de las fechas.</span>
+          </label>
+
+          <fieldset>
+            <legend>7. Tipo de renta *</legend>
+            <label class="inline"><input type="radio" name="rental_type" value="internal" checked /> Internal (DISW — sin costo)</label>
+            <label class="inline"><input type="radio" name="rental_type" value="external" /> External (con costo)</label>
+          </fieldset>
+
+          <label>8. Sede / Sala
+            <input type="text" name="room_site" value="2C-1 · CDMX" disabled />
+          </label>
+
+          <label>9. Información adicional
+            <textarea name="notes" rows="2" maxlength="1000"></textarea>
+          </label>
+
+          <!-- Campos ARE: solo visibles/obligatorios para External -->
+          <div id="areFields" class="are hidden">
+            <p class="are-title">Datos de cargo (solo renta External):</p>
+            <div class="row">
+              <label>10. ARE *<input type="text" name="are" /></label>
+              <label>11. ORG ID *<input type="text" name="org_id" /></label>
+            </div>
+            <div class="row">
+              <label>12. GL Account *<input type="text" name="gl_account" /></label>
+              <label>13. Cost Center *<input type="text" name="cost_center" /></label>
+            </div>
+          </div>
+
+          <div id="costPreview" class="cost hidden"></div>
+
+          <button type="submit" id="submitBtn">Enviar solicitud</button>
+          <p id="formMsg" class="msg" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <!-- Consulta por token -->
+    <section class="card lookup" aria-labelledby="lookup-title">
+      <div class="card-head"><h2 id="lookup-title">Consultar una reserva</h2></div>
+      <div class="row">
+        <input type="text" id="tokenInput" placeholder="Pega aquí tu código de seguimiento (token)" />
+        <button type="button" id="lookupBtn">Consultar</button>
+      </div>
+      <div id="lookupResult" class="lookup-result"></div>
+    </section>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

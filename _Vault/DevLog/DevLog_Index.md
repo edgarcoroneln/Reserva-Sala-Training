@@ -55,6 +55,7 @@ tags: [devlog, sprint-1]
 | 2026-07-02 | Inicialización del proyecto desde template | Manual | — |
 | 2026-07-02 | PRD y Reporte Ejecutivo de la app de reserva 2C-1 | Claude Code | [[DevLog/2026-07-02-prd-y-reporte-ejecutivo]] |
 | 2026-07-02 | Ajuste de la regla de cancelación (≥ 1 semana / 5 días hábiles) | Claude Code | [[DevLog/2026-07-02-ajuste-regla-cancelacion]] |
+| 2026-07-02 | MVP Rebanada 1 — reserva + disponibilidad + anti-solapamiento | Claude Code | [[DevLog/2026-07-02-mvp-rebanada-1]] |
 
 ---
 

@@ -21,18 +21,20 @@ base para construir el MVP de la app de reserva de la sala 2C-1.
 - [x] PRD detallado escrito en [[01_Product/PRD]]
 - [x] Reporte Ejecutivo escrito en [[01_Product/Reporte_Ejecutivo]]
 - [x] Documentación del Vault coherente (índice, historias, arquitectura, riesgos, roadmap)
-- [ ] Aprobación del PRD por el stakeholder para arrancar la implementación del MVP
+- [x] **MVP Rebanada 1** — reserva + disponibilidad AM/PM + anti-solapamiento (backend + frontend + pruebas)
+- [ ] Rebanada 2 — estados Confirmada/Rechazada y validación DISW/ARE
 
 ---
 
 ## Tarea activa HOY
 
-**Estoy trabajando en:** Documentación del producto (PRD + Reporte Ejecutivo) que gobierna el MVP.
+**Estoy trabajando en:** MVP Rebanada 1 terminada (API + frontend + 19 pruebas en verde).
+Siguiente: Rebanada 2 (estados y módulo admin).
 
 **Archivos que voy a tocar:**
-- `_Vault/01_Product/PRD.md`
-- `_Vault/01_Product/Reporte_Ejecutivo.md`
-- Documentos de soporte del `_Vault/`
+- `src/` (backend Express + servicios)
+- `public/` (frontend)
+- `tests/` (pruebas)
 
 **Dependencias que necesito:**
 - Confirmación de acceso a **buzón institucional** y permisos de **Microsoft Graph** antes de la

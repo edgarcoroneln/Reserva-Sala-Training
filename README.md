@@ -1,6 +1,43 @@
-# project-dev-template
+# Reserva Sala de Entrenamiento 2C-1
 
-Template estándar para proyectos de desarrollo personal con:
+App web que reemplaza el Microsoft Form para reservar la sala de entrenamientos **2C-1** de DISW
+(2 Patios, CDMX): valida disponibilidad por bloques **AM/PM**, aplica el costo de renta a unidades
+ajenas a DISW y da seguimiento por token. Documentación completa en [`_Vault/01_Product/PRD.md`](_Vault/01_Product/PRD.md).
+
+- **Stack:** HTML + JavaScript · Node.js + Express · SQLite (→ PostgreSQL) · (integración Microsoft Graph pendiente)
+- **Estado:** Rebanada 1 del MVP — reserva + disponibilidad + anti-solapamiento.
+
+## Cómo correr la app (MVP)
+
+Requiere **Node.js ≥ 22.5** (usa el SQLite integrado de Node).
+
+```bash
+npm install        # instala dependencias (express)
+npm start          # inicia el servidor en http://localhost:3000
+npm test           # corre la suite de pruebas (node --test)
+npm run dev        # modo watch para desarrollo
+```
+
+Variables de entorno opcionales: `PORT` (default 3000), `DB_PATH` (default `./data/reservas.db`).
+
+### Endpoints (Rebanada 1)
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/api/room` | Datos de la sala y tarifas/turnos |
+| GET | `/api/availability?from=YYYY-MM-DD&to=YYYY-MM-DD` | Bloques ocupados en el rango |
+| POST | `/api/reservations` | Crea una pre-reserva (201 / 400 / 409) |
+| GET | `/api/reservations/:token` | Consulta una reserva por su token |
+
+> **Siguientes rebanadas:** estados Confirmada/Rechazada + módulo admin, notificaciones (Graph),
+> cancelación (regla de 1 semana) y reportes. Ver [`_Vault/07_Roadmap/Roadmap.md`](_Vault/07_Roadmap/Roadmap.md).
+
+---
+
+<details>
+<summary>Documentación del template base (Vault de Obsidian, setup scripts)</summary>
+
+Este proyecto se generó a partir de un template estándar con:
 - **Vault de Obsidian** integrado (documentación, Kanban, DevLog)
 - **GitHub Actions** CI/CD (configurable por stack)
 - **CLAUDE.md** para colaboración con IA (Claude Code)
@@ -99,3 +136,5 @@ El setup script reemplaza estos valores automáticamente:
 ---
 
 Basado en las buenas prácticas del proyecto **recos-BnM** (2026).
+
+</details>
