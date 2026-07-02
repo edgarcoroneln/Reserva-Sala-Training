@@ -51,8 +51,8 @@ sistema **bloquea la agenda al instante**, avisa al administrador, y una vez val
 - **Tarifa:** **300 USD por día** completo, **150 USD por medio día** (mañana o tarde). El cobro se
   realiza por **movimiento ICC**, fuera del sistema; la app solo lo calcula e informa.
 - **Sin choques de agenda:** si un bloque ya está ocupado, la solicitud **no** se puede enviar.
-- **Cancelación autoservicio** hasta **2 días hábiles antes** (considerando festivos de México);
-  después, se gestiona con el administrador.
+- **Cancelación autoservicio** hasta **1 semana antes (5 días hábiles)** (considerando festivos de
+  México); después, se gestiona con el administrador.
 - **Validación humana:** todas las reservas pasan por el administrador antes de confirmarse.
 
 ## 5. Beneficios

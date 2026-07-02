@@ -41,7 +41,7 @@ updated: "2026-07-02"
 
 **Criterios de aceptación:**
 - [ ] El enlace usa un **token** no adivinable y muestra detalle + estado
-- [ ] Permite cancelar según la regla de ≥ 2 días hábiles (Épica 5)
+- [ ] Permite cancelar según la regla de ≥ 5 días hábiles / 1 semana (Épica 5)
 
 ---
 
@@ -115,12 +115,12 @@ updated: "2026-07-02"
 
 ### HU 5.1 — Cancelar dentro de plazo
 **Como** solicitante
-**Quiero** cancelar desde el enlace único si faltan ≥ 2 días hábiles
+**Quiero** cancelar desde el enlace único si faltan ≥ 5 días hábiles (1 semana)
 **Para** liberar la sala sin intervención del admin
 
 **Criterios de aceptación:**
-- [ ] Botón habilitado solo con ≥ 2 días hábiles (excluye fin de semana y festivos MX)
-- [ ] Dentro de los 2 días, botón bloqueado con mensaje para contactar al admin
+- [ ] Botón habilitado solo con ≥ 5 días hábiles / 1 semana (excluye fin de semana y festivos MX)
+- [ ] Con menos de 5 días hábiles (menos de 1 semana), botón bloqueado con mensaje para contactar al admin
 - [ ] Al cancelar, se liberan bloques, estado *Cancelada* y correo de confirmación
 
 ---

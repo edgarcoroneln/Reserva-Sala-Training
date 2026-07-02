@@ -16,7 +16,7 @@ reporte a finanzas — reemplazando el Microsoft Form.
 - [ ] Cálculo de costo (300/día, 150/medio día) para External
 - [ ] Flujo Pendiente → Confirmada/Rechazada → Cancelada con validación del admin
 - [ ] Notificaciones por correo institucional (Graph) + .ics en confirmación
-- [ ] Cancelación autoservicio (≥ 2 días hábiles, festivos MX) por enlace único
+- [ ] Cancelación autoservicio (≥ 5 días hábiles / 1 semana, festivos MX) por enlace único
 - [ ] Módulo de administración con login (cola, calendario, configuración, admins)
 - [ ] Export on-demand + reporte mensual automático al correo designado
 - [ ] Bitácora de auditoría

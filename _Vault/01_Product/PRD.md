@@ -56,7 +56,7 @@ gestionada 100% por la app).
 | Tiempo de validación de una pre-reserva | **< 24 h hábiles** | Timestamp `Pendiente → Confirmada/Rechazada` |
 | Rentas externas cobradas vs. facturables | **100%** | Reservas *External* confirmadas incluidas en el reporte mensual |
 | Reservas creadas por la app vs. Forms | **100%** (Forms retirado) | Conteo de reservas por canal |
-| Cancelaciones dentro de plazo (autoservicio) | **≥ 90%** | Cancelaciones con ≥2 días hábiles / total de cancelaciones |
+| Cancelaciones dentro de plazo (autoservicio) | **≥ 90%** | Cancelaciones con ≥ 5 días hábiles (1 semana) / total de cancelaciones |
 | Ocupación de la sala (bloques AM/PM usados) | Línea base + tendencia | Bloques confirmados / bloques disponibles |
 
 ---
@@ -96,7 +96,7 @@ necesita reservar la sala 2C-1 para un entrenamiento.
 - **Notificaciones por correo** (Microsoft Graph, buzón institucional) en cada transición, con
   archivo **.ics** adjunto en la confirmación.
 - **Enlace único con token** para que el solicitante vea el estado y **cancele** (autoservicio) con
-  regla de **≥ 2 días hábiles** (calendario laboral de México).
+  regla de **≥ 5 días hábiles (1 semana)** (calendario laboral de México).
 - **Módulo de administración** con login propio: cola de validación, calendario, configuración
   (precios, horarios de bloque, festivos, buzón, correo de reportes, administradores).
 - **Export** de reporte (Excel/CSV) on-demand y **envío automático del reporte mensual** al correo
@@ -123,8 +123,8 @@ necesita reservar la sala 2C-1 para un entrenamiento.
 > - **Bloques:** cada día = **AM (08:00–13:00)** y **PM (13:00–18:00)**, configurables.
 > - **Costo:** `total = bloques_reservados × 150 USD` → día completo (AM+PM) = 300 USD.
 > - **Internal = DISW** → sin costo, sin campos ARE. **External** → costo + ARE (10–13) obligatorios.
-> - **Cancelación autoservicio** permitida solo si faltan **≥ 2 días hábiles** (excluye sábados,
->   domingos y festivos oficiales de México).
+> - **Cancelación autoservicio** permitida solo si faltan **≥ 5 días hábiles (1 semana)** (excluye
+>   sábados, domingos y festivos oficiales de México).
 > - El **calendario se bloquea desde la pre-reserva** (estado *Pendiente*).
 
 ### Épica 1: Reserva y disponibilidad (Solicitante)
@@ -152,7 +152,7 @@ enviar mi solicitud, para reservar la sala.
 el estado de mi reserva sin crear cuenta.
 - Criterios de aceptación:
   - [ ] El enlace contiene un **token** no adivinable y muestra el detalle y estado actual.
-  - [ ] Desde ahí puedo **cancelar** si aplica la regla de ≥ 2 días hábiles (ver Épica 5).
+  - [ ] Desde ahí puedo **cancelar** si aplica la regla de ≥ 5 días hábiles (1 semana) (ver Épica 5).
 
 ### Épica 2: Validación y administración (Administrador)
 **HU 2.1 — Login de administrador:** Como administrador, quiero iniciar sesión de forma segura para
@@ -203,11 +203,12 @@ institucional en cada transición de estado, para mantener informados a solicita
 
 ### Épica 5: Cancelación autoservicio
 **HU 5.1 — Cancelar dentro de plazo:** Como solicitante, quiero cancelar mi reserva desde el enlace
-único si faltan ≥ 2 días hábiles, para liberar la sala sin intervención del admin.
+único si faltan ≥ 5 días hábiles (1 semana), para liberar la sala sin intervención del admin.
 - Criterios de aceptación:
-  - [ ] El botón de cancelar está **habilitado** solo si faltan **≥ 2 días hábiles** (excluye
-        fin de semana y festivos MX) respecto a la fecha de inicio.
-  - [ ] Dentro de los 2 días, el botón se **bloquea** con mensaje para **contactar al administrador**.
+  - [ ] El botón de cancelar está **habilitado** solo si faltan **≥ 5 días hábiles (1 semana)**
+        (excluye fin de semana y festivos MX) respecto a la fecha de inicio.
+  - [ ] Con menos de 5 días hábiles (menos de 1 semana), el botón se **bloquea** con mensaje para
+        **contactar al administrador**.
   - [ ] Al cancelar, se **liberan los bloques**, la reserva pasa a *Cancelada* y se envía correo de
         confirmación de cancelación.
 
@@ -339,7 +340,7 @@ Ver [[07_Roadmap/Roadmap]].
                  ▼                                                             ▼
              CONFIRMADA                                                    RECHAZADA
                  │                                                     (libera bloques)
-                 │  cancelación autoservicio (≥2 días hábiles)
+                 │  cancelación autoservicio (≥5 días hábiles / 1 semana)
                  │  o cancelación por admin
                  ▼
              CANCELADA  (libera bloques)
@@ -386,9 +387,9 @@ bloques = Σ (por cada día del rango) { 2 si Complete Day, 1 si Half Day }
 costo_usd = (rental_type == External) ? bloques × 150 : 0
 ```
 
-**Días hábiles (para la regla de cancelación ≥ 2):**
+**Días hábiles (para la regla de cancelación ≥ 5 / 1 semana):**
 ```
 Se cuentan los días entre HOY y start_date excluyendo sábados, domingos
 y fechas presentes en `holidays` (festivos oficiales de México).
-Cancelación autoservicio permitida  ⇔  días_hábiles(HOY, start_date) ≥ 2
+Cancelación autoservicio permitida  ⇔  días_hábiles(HOY, start_date) ≥ 5
 ```
