@@ -1,6 +1,86 @@
-# project-dev-template
+# Reserva Sala de Entrenamiento 2C-1
 
-Template estándar para proyectos de desarrollo personal con:
+App web que reemplaza el Microsoft Form para reservar la sala de entrenamientos **2C-1** de DISW
+(2 Patios, CDMX): valida disponibilidad por bloques **AM/PM**, aplica el costo de renta a unidades
+ajenas a DISW y da seguimiento por token. Documentación completa en [`_Vault/01_Product/PRD.md`](_Vault/01_Product/PRD.md).
+
+- **Stack:** HTML + JavaScript · Node.js + Express · SQLite (→ PostgreSQL) · (integración Microsoft Graph pendiente)
+- **Estado:** MVP completo (rebanadas 1–5) — reserva, disponibilidad, administración, **notificaciones por correo**, **cancelación autoservicio** y **reportes a finanzas**.
+
+## Cómo correr la app (MVP)
+
+Requiere **Node.js ≥ 22.5** (usa el SQLite integrado de Node).
+
+```bash
+npm install        # instala dependencias (express, exceljs)
+npm start          # inicia el servidor en http://localhost:3000
+npm test           # corre la suite de pruebas (node --test)
+npm run dev        # modo watch para desarrollo
+npm run seed:demo  # genera datos de DEMO para ver el tablero de utilización
+```
+
+> `npm run seed:demo` reinicia las reservas y crea ~70 registros de ejemplo (varios meses, estados y
+> tipos) para visualizar las gráficas. Úsalo solo en local.
+
+Variables de entorno (ver [`.env.example`](.env.example)): `PORT`, `DB_PATH`,
+`ADMIN_USER` / `ADMIN_PASSWORD` (admin inicial), `REPORT_EMAIL` / `ADMIN_NOTIFY_EMAIL` (correos),
+`MAIL_TRANSPORT` (`console` por defecto o `graph`) y las `GRAPH_*` para Microsoft Graph.
+
+> **Correo local sin credenciales:** con `MAIL_TRANSPORT=console` (default) los correos NO se envían;
+> se registran en la tabla `emails` y en la consola, así puedes probar todo el flujo sin Microsoft
+> Graph. Para envío real, define `MAIL_TRANSPORT=graph` y las variables `GRAPH_*`.
+>
+> **Configurable desde la app:** en el módulo de administración (**Configuración de correo**) puedes
+> editar el transporte, el **correo institucional remitente**, los destinos y los IDs de Graph, y
+> enviar un **correo de prueba**. El `GRAPH_CLIENT_SECRET` se mantiene solo en `.env` por seguridad.
+
+### Módulo de administración
+
+- URL: **http://localhost:3000/admin.html** (enlace "Administración" en la esquina superior de la app).
+- Al primer arranque se crea un admin por defecto: **usuario `admin` / contraseña `admin123`**
+  (cámbialo con `ADMIN_USER` / `ADMIN_PASSWORD`). La sesión usa cookie httpOnly.
+
+### Endpoints
+
+**Públicos**
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/api/room` | Datos de la sala y tarifas/turnos |
+| GET | `/api/availability?from=YYYY-MM-DD&to=YYYY-MM-DD` | Bloques ocupados en el rango |
+| POST | `/api/reservations` | Crea una pre-reserva (201 / 400 / 409) |
+| GET | `/api/reservations/:token` | Consulta una reserva + elegibilidad de cancelación |
+| POST | `/api/reservations/:token/cancel` | Cancelación autoservicio (≥ 5 días hábiles / 1 semana) |
+
+**Administración** (requieren sesión)
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| POST | `/api/admin/login` · `/api/admin/logout` | Inicia / cierra sesión |
+| GET | `/api/admin/me` | Admin de la sesión actual |
+| GET | `/api/admin/reservations?status=` | Listado + conteos por estado |
+| POST | `/api/admin/reservations/:id/confirm` | Confirma una pendiente (notifica) |
+| POST | `/api/admin/reservations/:id/reject` | Rechaza (con motivo), libera calendario y notifica |
+| POST | `/api/admin/reservations/:id/cancel` | Cancela una confirmada, libera calendario y notifica |
+| GET · PUT | `/api/admin/settings` | Lee / actualiza la configuración de correo (transporte, remitente, destinos, IDs de Graph) |
+| POST | `/api/admin/mail/test` | Envía un correo de prueba con la configuración actual |
+| GET | `/api/admin/reports/summary?from&to` | Métricas de utilización del periodo (para las gráficas) |
+| GET | `/api/admin/reports/reservations.xlsx` | Export **Excel** (filtros `from`/`to`/`status`) |
+| GET | `/api/admin/reports/monthly.xlsx?month=YYYY-MM` | **Excel** facturable del mes (hoja Resumen + detalle) |
+| POST | `/api/admin/reports/monthly/send` | Envía el reporte mensual (Excel) por correo |
+
+El módulo admin incluye un **tablero de "Utilización de la sala"** con selector de periodo, KPIs y
+**gráficas** (utilización por mes, reservas por estado, ingresos por mes). El **reporte mensual**
+(External confirmadas) se envía **automáticamente** al inicio de cada mes al `REPORT_EMAIL`
+configurado, en **Excel**. Documentación funcional completa en
+[`_Vault/01_Product/PRD.md`](_Vault/01_Product/PRD.md).
+
+---
+
+<details>
+<summary>Documentación del template base (Vault de Obsidian, setup scripts)</summary>
+
+Este proyecto se generó a partir de un template estándar con:
 - **Vault de Obsidian** integrado (documentación, Kanban, DevLog)
 - **GitHub Actions** CI/CD (configurable por stack)
 - **CLAUDE.md** para colaboración con IA (Claude Code)
@@ -99,3 +179,5 @@ El setup script reemplaza estos valores automáticamente:
 ---
 
 Basado en las buenas prácticas del proyecto **recos-BnM** (2026).
+
+</details>

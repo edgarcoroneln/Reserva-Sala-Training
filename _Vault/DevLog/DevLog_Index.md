@@ -1,10 +1,10 @@
 ---
-project: "{{PROJECT_NAME}}"
-developer: "{{DEVELOPER_NAME}}"
+project: "Reserva Sala de Entrenamiento 2C-1"
+developer: "Edgar Coronel"
 status: "Active"
 ---
 
-# DevLog Index — {{PROJECT_NAME}}
+# DevLog Index — Reserva Sala de Entrenamiento 2C-1
 
 > Registro cronológico de sesiones de desarrollo.
 > Una entrada por sesión significativa con IA o por decisión técnica importante.
@@ -52,8 +52,14 @@ tags: [devlog, sprint-1]
 
 | Fecha | Descripción | Agente | Archivo |
 |-------|-------------|--------|---------|
-| {{DATE}} | Inicialización del proyecto desde template | Manual | — |
-| (siguiente sesión) | (descripción) | Claude Code | [[DevLog/YYYY-MM-DD-descripcion]] |
+| 2026-07-02 | Inicialización del proyecto desde template | Manual | — |
+| 2026-07-02 | PRD y Reporte Ejecutivo de la app de reserva 2C-1 | Claude Code | [[DevLog/2026-07-02-prd-y-reporte-ejecutivo]] |
+| 2026-07-02 | Ajuste de la regla de cancelación (≥ 1 semana / 5 días hábiles) | Claude Code | [[DevLog/2026-07-02-ajuste-regla-cancelacion]] |
+| 2026-07-02 | MVP Rebanada 1 — reserva + disponibilidad + anti-solapamiento | Claude Code | [[DevLog/2026-07-02-mvp-rebanada-1]] |
+| 2026-07-02 | MVP Rebanada 2 — módulo de administración (auth + estados) | Claude Code | [[DevLog/2026-07-02-mvp-rebanada-2-admin]] |
+| 2026-07-02 | MVP Rebanadas 4–5 — correo, cancelación autoservicio, reportes | Claude Code | [[DevLog/2026-07-02-mvp-rebanadas-4-5]] |
+| 2026-07-02 | Configuración de correo desde el módulo admin (remitente + prueba) | Claude Code | [[DevLog/2026-07-02-config-correo-admin]] |
+| 2026-07-02 | Tablero de utilización + reportes en Excel + datos demo | Claude Code | [[DevLog/2026-07-02-tablero-utilizacion-excel]] |
 
 ---
 

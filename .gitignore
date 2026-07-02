@@ -12,6 +12,12 @@ service-account.json
 node_modules/
 dist/
 build/
+
+# === App data (SQLite local) ===
+data/
+*.db
+*.db-shm
+*.db-wal
 .next/
 .nuxt/
 .cache/

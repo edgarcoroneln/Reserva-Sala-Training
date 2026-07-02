@@ -1,0 +1,27 @@
+{
+  "name": "reserva-sala-training",
+  "version": "0.1.0",
+  "description": "App web para reservar la sala de entrenamiento 2C-1 de DISW (MVP).",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test",
+    "seed:demo": "node scripts/seed-demo.mjs"
+  },
+  "keywords": [
+    "reservas",
+    "sala",
+    "disw",
+    "siemens"
+  ],
+  "author": "Edgar Coronel",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "express": "^4.19.2"
+  }
+}

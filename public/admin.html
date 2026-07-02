@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Administración — Sala 2C-1</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Administración — Sala 2C-1</h1>
+      <p class="subtitle">Validación de reservas · reportes · configuración</p>
+    </header>
+
+    <!-- Login -->
+    <section id="loginView" class="card lookup hidden" aria-labelledby="login-title">
+      <div class="card-head"><h2 id="login-title">Iniciar sesión</h2></div>
+      <form id="loginForm">
+        <label>Usuario
+          <input type="text" name="username" autocomplete="username" required />
+        </label>
+        <label>Contraseña
+          <input type="password" name="password" autocomplete="current-password" required />
+        </label>
+        <button type="submit">Entrar</button>
+        <p id="loginMsg" class="msg" role="status"></p>
+      </form>
+    </section>
+
+    <!-- Tablero -->
+    <section id="dashView" class="hidden">
+      <div class="admin-bar">
+        <div id="counts" class="counts"></div>
+        <div class="admin-user">
+          <span id="whoami" class="muted"></span>
+          <button type="button" id="refreshBtn" class="btn-secondary">Actualizar</button>
+          <button type="button" id="logoutBtn" class="btn-secondary">Salir</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="filters" id="filters">
+          <button type="button" class="filter active" data-status="pending">Pendientes</button>
+          <button type="button" class="filter" data-status="confirmed">Confirmadas</button>
+          <button type="button" class="filter" data-status="rejected">Rechazadas</button>
+          <button type="button" class="filter" data-status="cancelled">Canceladas</button>
+          <button type="button" class="filter" data-status="">Todas</button>
+        </div>
+        <div id="tableWrap" class="table-wrap"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Utilización de la sala</h2>
+          <div class="period">
+            <label>Desde <input type="date" id="fromDate" /></label>
+            <label>Hasta <input type="date" id="toDate" /></label>
+            <button type="button" id="applyPeriod" class="btn-secondary">Actualizar</button>
+          </div>
+        </div>
+
+        <div id="kpis" class="kpis"></div>
+
+        <div class="charts-grid">
+          <figure class="chart">
+            <figcaption>Utilización por mes <span class="muted">(bloques usados / capacidad)</span></figcaption>
+            <div id="chartUtil"></div>
+          </figure>
+          <figure class="chart">
+            <figcaption>Reservas por estado</figcaption>
+            <div id="chartStatus" class="donut-wrap"></div>
+          </figure>
+          <figure class="chart">
+            <figcaption>Ingresos por mes <span class="muted">(External confirmadas, USD)</span></figcaption>
+            <div id="chartRevenue"></div>
+          </figure>
+        </div>
+
+        <div class="report-actions">
+          <a id="downloadRange" class="btn-secondary" href="#">Descargar Excel del periodo</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Configuración de correo</h2></div>
+
+        <div class="row">
+          <label>Transporte
+            <select id="mailTransport">
+              <option value="console">Local (consola / sin envío real)</option>
+              <option value="graph">Microsoft Graph (envío real)</option>
+            </select>
+          </label>
+          <label style="flex:2">Correo institucional remitente (De:)
+            <input type="email" id="mailSender" placeholder="sala2c1@tu-dominio.com" />
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Aviso de nuevas reservas (admin)
+            <input type="email" id="adminNotifyEmail" placeholder="admin@ejemplo.com" />
+          </label>
+          <label>Correo del reporte mensual (finanzas)
+            <input type="email" id="reportEmail" placeholder="finanzas@ejemplo.com" />
+          </label>
+        </div>
+
+        <details class="graph-block">
+          <summary>Credenciales de Microsoft Graph</summary>
+          <div class="row">
+            <label>Tenant ID <input type="text" id="graphTenant" placeholder="00000000-0000-..." /></label>
+            <label>Client ID <input type="text" id="graphClient" placeholder="00000000-0000-..." /></label>
+          </div>
+          <p class="hint">
+            Client Secret: <b id="secretState">—</b>. Por seguridad, el secreto se define solo en la
+            variable de entorno <code>GRAPH_CLIENT_SECRET</code> del servidor (archivo <code>.env</code>),
+            no desde esta pantalla.
+          </p>
+        </details>
+
+        <div class="report-actions">
+          <button type="button" id="saveMailBtn">Guardar configuración</button>
+          <input type="email" id="testTo" placeholder="correo para prueba" />
+          <button type="button" id="testMailBtn" class="btn-secondary">Enviar correo de prueba</button>
+        </div>
+        <p id="mailMsg" class="msg" role="status"></p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Reporte mensual a finanzas</h2></div>
+        <div class="report-actions">
+          <label>Mes <input type="month" id="reportMonth" /></label>
+          <a id="downloadMonthly" class="btn-secondary" href="#">Descargar Excel del mes</a>
+          <button type="button" id="sendMonthlyBtn" class="btn-secondary">Enviar por correo</button>
+        </div>
+        <p id="reportMsg" class="msg" role="status"></p>
+        <p class="hint">El Excel incluye una hoja "Resumen" con la utilización y una hoja con el detalle facturable. El reporte mensual (External confirmadas) también se envía automáticamente al inicio de cada mes al correo configurado abajo.</p>
+      </div>
+    </section>
+
+    <script src="/charts.js"></script>
+    <script src="/admin.js"></script>
+  </body>
+</html>
