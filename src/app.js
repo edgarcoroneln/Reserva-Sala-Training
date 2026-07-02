@@ -21,7 +21,18 @@ import * as notify from './services/notifications.js';
 import { getReportEmail, setSetting, getMailConfig, EDITABLE_SETTINGS } from './services/settings.js';
 import {
   toCsv, reservationsForReport, monthlyBillable, sendMonthlyReport, previousMonth,
+  reportSummary, reservationsXlsx, monthlyXlsx,
 } from './services/reports.js';
+
+const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+// Rango por defecto: últimos 6 meses hasta hoy (para el tablero de utilización).
+function defaultRange() {
+  const now = new Date();
+  const to = now.toISOString().slice(0, 10);
+  const from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 5, 1)).toISOString().slice(0, 10);
+  return { from, to };
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -188,6 +199,38 @@ export function createApp(db, { mailer = createMailer(db) } = {}) {
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', `attachment; filename="reporte-${month}.csv"`);
       res.send(toCsv(monthlyBillable(db, month)));
+    } catch (err) { next(err); }
+  });
+
+  // Resumen de utilización (para el tablero de gráficas).
+  app.get('/api/admin/reports/summary', admin, (req, res, next) => {
+    try {
+      const def = defaultRange();
+      const from = String(req.query.from || def.from);
+      const to = String(req.query.to || def.to);
+      res.json(reportSummary(db, from, to));
+    } catch (err) { next(err); }
+  });
+
+  // Exportables en Excel (.xlsx).
+  app.get('/api/admin/reports/reservations.xlsx', admin, async (req, res, next) => {
+    try {
+      const buf = await reservationsXlsx(db, {
+        from: req.query.from, to: req.query.to, status: req.query.status,
+      });
+      res.setHeader('Content-Type', XLSX_MIME);
+      res.setHeader('Content-Disposition', 'attachment; filename="reservas.xlsx"');
+      res.send(buf);
+    } catch (err) { next(err); }
+  });
+
+  app.get('/api/admin/reports/monthly.xlsx', admin, async (req, res, next) => {
+    try {
+      const month = String(req.query.month || previousMonth());
+      const buf = await monthlyXlsx(db, month);
+      res.setHeader('Content-Type', XLSX_MIME);
+      res.setHeader('Content-Disposition', `attachment; filename="reporte-${month}.xlsx"`);
+      res.send(buf);
     } catch (err) { next(err); }
   });
 

@@ -24,8 +24,68 @@ function showDash(username) {
   $('#loginView').classList.add('hidden');
   $('#dashView').classList.remove('hidden');
   $('#whoami').textContent = `Sesión: ${username}`;
+  const now = new Date();
+  $('#fromDate').value = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 5, 1)).toISOString().slice(0, 10);
+  $('#toDate').value = now.toISOString().slice(0, 10);
   loadReservations();
   loadSettings();
+  loadSummary();
+}
+
+const MON = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+const monthLabel = (m) => `${MON[+m.split('-')[1] - 1]} ${m.split('-')[0].slice(2)}`;
+
+function updateRangeLink() {
+  $('#downloadRange').href = `/api/admin/reports/reservations.xlsx?from=${$('#fromDate').value}&to=${$('#toDate').value}`;
+}
+
+async function loadSummary() {
+  updateRangeLink();
+  const from = $('#fromDate').value;
+  const to = $('#toDate').value;
+  const { ok, data } = await api(`/api/admin/reports/summary?from=${from}&to=${to}`);
+  if (!ok) return;
+  renderKpis(data.totals);
+  renderCharts(data);
+}
+
+function renderKpis(t) {
+  const tiles = [
+    ['Utilización', `${t.utilization}%`],
+    ['Bloques usados', `${t.blocksUsed} / ${t.capacity}`],
+    ['Ingresos', `${t.revenue.toLocaleString('es-MX')} USD`],
+    ['Confirmadas', t.confirmed],
+    ['AM / PM', `${t.am} / ${t.pm}`],
+  ];
+  $('#kpis').innerHTML = tiles
+    .map(([k, v]) => `<div class="kpi"><div class="kpi-v">${v}</div><div class="kpi-k">${k}</div></div>`)
+    .join('');
+}
+
+function renderCharts(d) {
+  const C = window.Charts;
+  const util = d.byMonth.map((m) => ({
+    label: monthLabel(m.month), value: m.utilization, display: m.utilization,
+    title: `${m.month}: ${m.used}/${m.capacity} bloques (${m.utilization}%)`,
+  }));
+  $('#chartUtil').innerHTML = C.barChart({ items: util, max: 100, color: C.COLORS.blue, unit: '%', track: true, gridPct: true });
+
+  const s = d.byStatus;
+  const seg = [
+    { label: 'Confirmadas', value: s.confirmed, color: C.COLORS.confirmed },
+    { label: 'Pendientes', value: s.pending, color: C.COLORS.pending },
+    { label: 'Rechazadas', value: s.rejected, color: C.COLORS.rejected },
+    { label: 'Canceladas', value: s.cancelled, color: C.COLORS.cancelled },
+  ];
+  const total = seg.reduce((a, b) => a + b.value, 0);
+  const dn = C.donut(seg, { centerValue: total, centerLabel: 'reservas' });
+  $('#chartStatus').innerHTML = dn.svg + dn.legend;
+
+  const rev = d.byMonth.map((m) => ({
+    label: monthLabel(m.month), value: m.revenue, display: `$${m.revenue}`,
+    title: `${m.month}: ${m.revenue} USD`,
+  }));
+  $('#chartRevenue').innerHTML = C.barChart({ items: rev, color: C.COLORS.aqua });
 }
 
 function prevMonthValue() {
@@ -51,7 +111,7 @@ async function loadSettings() {
 
 function updateMonthlyLink() {
   const month = $('#reportMonth').value || prevMonthValue();
-  $('#downloadMonthly').href = `/api/admin/reports/monthly.csv?month=${month}`;
+  $('#downloadMonthly').href = `/api/admin/reports/monthly.xlsx?month=${month}`;
 }
 
 async function saveMailSettings() {
@@ -254,6 +314,9 @@ function init() {
   $('#testMailBtn').addEventListener('click', sendTestMail);
   $('#sendMonthlyBtn').addEventListener('click', sendMonthly);
   $('#reportMonth').addEventListener('change', updateMonthlyLink);
+  $('#applyPeriod').addEventListener('click', loadSummary);
+  $('#fromDate').addEventListener('change', updateRangeLink);
+  $('#toDate').addEventListener('change', updateRangeLink);
   $('#filters').addEventListener('click', (e) => {
     const btn = e.target.closest('.filter');
     if (!btn) return;

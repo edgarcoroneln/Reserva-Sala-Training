@@ -176,6 +176,28 @@ button[type="submit"]:hover, #lookupBtn:hover { background: var(--teal-dark); }
 .graph-block summary { cursor: pointer; font-size: 0.85rem; font-weight: 600; }
 select#mailTransport { width: 100%; margin-top: 0.25rem; padding: 0.5rem; border: 1px solid var(--line); border-radius: 6px; font: inherit; background: #fff; }
 
+/* --- Tablero de utilización --- */
+.period { display: flex; gap: 0.5rem; align-items: flex-end; flex-wrap: wrap; }
+.period label { font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+.period input { margin-top: 0.15rem; padding: 0.35rem; border: 1px solid var(--line); border-radius: 6px; font: inherit; }
+.period .btn-secondary { align-self: flex-end; }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.6rem; margin: 0.4rem 0 1rem; }
+.kpi { background: #f7f9f9; border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; }
+.kpi-v { font-size: 1.4rem; font-weight: 700; color: var(--teal-dark); line-height: 1.1; }
+.kpi-k { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; margin-top: 2px; }
+
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.chart { margin: 0; border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; background: #fff; }
+.chart figcaption { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; }
+.chart figcaption .muted { font-weight: 400; }
+.donut-wrap { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.chart-legend { list-style: none; margin: 0; padding: 0; font-size: 0.82rem; }
+.chart-legend li { display: flex; align-items: center; gap: 0.4rem; padding: 2px 0; }
+.chart-legend .sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+
+@media (max-width: 760px) { .charts-grid { grid-template-columns: 1fr; } }
+
 @media (max-width: 760px) {
   .layout { grid-template-columns: 1fr; }
   .row { flex-direction: column; }

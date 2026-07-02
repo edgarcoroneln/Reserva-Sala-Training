@@ -49,7 +49,7 @@ test('sendMonthlyReport registra el correo (outbox) y adjunta CSV', async () => 
   assert.equal(r.to, 'finanzas@x.com');
   const row = db.prepare("SELECT * FROM emails WHERE template='monthly_report'").get();
   assert.ok(row);
-  assert.match(row.attachments, /reporte-2C-1-2026-07\.csv/);
+  assert.match(row.attachments, /reporte-2C-1-2026-07\.xlsx/);
 });
 
 test('maybeRunMonthlyReport envía una vez y no repite el mismo mes', async () => {

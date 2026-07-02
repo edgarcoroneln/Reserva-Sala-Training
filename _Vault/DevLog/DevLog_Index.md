@@ -59,6 +59,7 @@ tags: [devlog, sprint-1]
 | 2026-07-02 | MVP Rebanada 2 — módulo de administración (auth + estados) | Claude Code | [[DevLog/2026-07-02-mvp-rebanada-2-admin]] |
 | 2026-07-02 | MVP Rebanadas 4–5 — correo, cancelación autoservicio, reportes | Claude Code | [[DevLog/2026-07-02-mvp-rebanadas-4-5]] |
 | 2026-07-02 | Configuración de correo desde el módulo admin (remitente + prueba) | Claude Code | [[DevLog/2026-07-02-config-correo-admin]] |
+| 2026-07-02 | Tablero de utilización + reportes en Excel + datos demo | Claude Code | [[DevLog/2026-07-02-tablero-utilizacion-excel]] |
 
 ---
 

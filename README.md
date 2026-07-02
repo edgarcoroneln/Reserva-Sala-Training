@@ -12,11 +12,15 @@ ajenas a DISW y da seguimiento por token. Documentación completa en [`_Vault/01
 Requiere **Node.js ≥ 22.5** (usa el SQLite integrado de Node).
 
 ```bash
-npm install        # instala dependencias (express)
+npm install        # instala dependencias (express, exceljs)
 npm start          # inicia el servidor en http://localhost:3000
 npm test           # corre la suite de pruebas (node --test)
 npm run dev        # modo watch para desarrollo
+npm run seed:demo  # genera datos de DEMO para ver el tablero de utilización
 ```
+
+> `npm run seed:demo` reinicia las reservas y crea ~70 registros de ejemplo (varios meses, estados y
+> tipos) para visualizar las gráficas. Úsalo solo en local.
 
 Variables de entorno (ver [`.env.example`](.env.example)): `PORT`, `DB_PATH`,
 `ADMIN_USER` / `ADMIN_PASSWORD` (admin inicial), `REPORT_EMAIL` / `ADMIN_NOTIFY_EMAIL` (correos),
@@ -60,12 +64,15 @@ Variables de entorno (ver [`.env.example`](.env.example)): `PORT`, `DB_PATH`,
 | POST | `/api/admin/reservations/:id/cancel` | Cancela una confirmada, libera calendario y notifica |
 | GET · PUT | `/api/admin/settings` | Lee / actualiza la configuración de correo (transporte, remitente, destinos, IDs de Graph) |
 | POST | `/api/admin/mail/test` | Envía un correo de prueba con la configuración actual |
-| GET | `/api/admin/reports/reservations.csv` | Export CSV (filtros `from`/`to`/`status`) |
-| GET | `/api/admin/reports/monthly.csv?month=YYYY-MM` | CSV facturable del mes |
-| POST | `/api/admin/reports/monthly/send` | Envía el reporte mensual por correo |
+| GET | `/api/admin/reports/summary?from&to` | Métricas de utilización del periodo (para las gráficas) |
+| GET | `/api/admin/reports/reservations.xlsx` | Export **Excel** (filtros `from`/`to`/`status`) |
+| GET | `/api/admin/reports/monthly.xlsx?month=YYYY-MM` | **Excel** facturable del mes (hoja Resumen + detalle) |
+| POST | `/api/admin/reports/monthly/send` | Envía el reporte mensual (Excel) por correo |
 
-El **reporte mensual** (External confirmadas) se envía **automáticamente** al inicio de cada mes al
-`REPORT_EMAIL` configurado. Documentación funcional completa en
+El módulo admin incluye un **tablero de "Utilización de la sala"** con selector de periodo, KPIs y
+**gráficas** (utilización por mes, reservas por estado, ingresos por mes). El **reporte mensual**
+(External confirmadas) se envía **automáticamente** al inicio de cada mes al `REPORT_EMAIL`
+configurado, en **Excel**. Documentación funcional completa en
 [`_Vault/01_Product/PRD.md`](_Vault/01_Product/PRD.md).
 
 ---

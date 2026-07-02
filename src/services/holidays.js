@@ -42,6 +42,14 @@ export function businessDaysBetween(from, to, holidaySet = new Set()) {
   return count;
 }
 
+// Días hábiles en el rango [from, to] con AMBOS extremos incluidos (para capacidad).
+export function businessDaysInclusive(from, to, holidaySet = new Set()) {
+  if (!from || !to || to < from) return 0;
+  const d = new Date(`${to}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return businessDaysBetween(from, d.toISOString().slice(0, 10), holidaySet);
+}
+
 // ¿Se puede cancelar por autoservicio? Requiere ≥ N días hábiles de anticipación.
 export function canSelfCancel(startDate, today, holidaySet, minDays = CANCEL_MIN_BUSINESS_DAYS) {
   return businessDaysBetween(today, startDate, holidaySet) >= minDays;

@@ -51,6 +51,38 @@
       </div>
 
       <div class="card">
+        <div class="card-head">
+          <h2>Utilización de la sala</h2>
+          <div class="period">
+            <label>Desde <input type="date" id="fromDate" /></label>
+            <label>Hasta <input type="date" id="toDate" /></label>
+            <button type="button" id="applyPeriod" class="btn-secondary">Actualizar</button>
+          </div>
+        </div>
+
+        <div id="kpis" class="kpis"></div>
+
+        <div class="charts-grid">
+          <figure class="chart">
+            <figcaption>Utilización por mes <span class="muted">(bloques usados / capacidad)</span></figcaption>
+            <div id="chartUtil"></div>
+          </figure>
+          <figure class="chart">
+            <figcaption>Reservas por estado</figcaption>
+            <div id="chartStatus" class="donut-wrap"></div>
+          </figure>
+          <figure class="chart">
+            <figcaption>Ingresos por mes <span class="muted">(External confirmadas, USD)</span></figcaption>
+            <div id="chartRevenue"></div>
+          </figure>
+        </div>
+
+        <div class="report-actions">
+          <a id="downloadRange" class="btn-secondary" href="#">Descargar Excel del periodo</a>
+        </div>
+      </div>
+
+      <div class="card">
         <div class="card-head"><h2>Configuración de correo</h2></div>
 
         <div class="row">
@@ -96,18 +128,18 @@
       </div>
 
       <div class="card">
-        <div class="card-head"><h2>Reportes a finanzas</h2></div>
+        <div class="card-head"><h2>Reporte mensual a finanzas</h2></div>
         <div class="report-actions">
           <label>Mes <input type="month" id="reportMonth" /></label>
-          <a id="downloadMonthly" class="btn-secondary" href="#">Descargar CSV del mes</a>
+          <a id="downloadMonthly" class="btn-secondary" href="#">Descargar Excel del mes</a>
           <button type="button" id="sendMonthlyBtn" class="btn-secondary">Enviar por correo</button>
-          <a id="downloadAll" class="btn-secondary" href="/api/admin/reports/reservations.csv">Descargar todas (CSV)</a>
         </div>
         <p id="reportMsg" class="msg" role="status"></p>
-        <p class="hint">El reporte mensual (External confirmadas) también se envía automáticamente al inicio de cada mes al correo configurado arriba.</p>
+        <p class="hint">El Excel incluye una hoja "Resumen" con la utilización y una hoja con el detalle facturable. El reporte mensual (External confirmadas) también se envía automáticamente al inicio de cada mes al correo configurado abajo.</p>
       </div>
     </section>
 
+    <script src="/charts.js"></script>
     <script src="/admin.js"></script>
   </body>
 </html>
