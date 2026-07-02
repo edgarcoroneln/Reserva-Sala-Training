@@ -25,6 +25,10 @@ Variables de entorno (ver [`.env.example`](.env.example)): `PORT`, `DB_PATH`,
 > **Correo local sin credenciales:** con `MAIL_TRANSPORT=console` (default) los correos NO se envían;
 > se registran en la tabla `emails` y en la consola, así puedes probar todo el flujo sin Microsoft
 > Graph. Para envío real, define `MAIL_TRANSPORT=graph` y las variables `GRAPH_*`.
+>
+> **Configurable desde la app:** en el módulo de administración (**Configuración de correo**) puedes
+> editar el transporte, el **correo institucional remitente**, los destinos y los IDs de Graph, y
+> enviar un **correo de prueba**. El `GRAPH_CLIENT_SECRET` se mantiene solo en `.env` por seguridad.
 
 ### Módulo de administración
 
@@ -54,7 +58,8 @@ Variables de entorno (ver [`.env.example`](.env.example)): `PORT`, `DB_PATH`,
 | POST | `/api/admin/reservations/:id/confirm` | Confirma una pendiente (notifica) |
 | POST | `/api/admin/reservations/:id/reject` | Rechaza (con motivo), libera calendario y notifica |
 | POST | `/api/admin/reservations/:id/cancel` | Cancela una confirmada, libera calendario y notifica |
-| GET · PUT | `/api/admin/settings` | Lee / actualiza el correo de reportes y de avisos |
+| GET · PUT | `/api/admin/settings` | Lee / actualiza la configuración de correo (transporte, remitente, destinos, IDs de Graph) |
+| POST | `/api/admin/mail/test` | Envía un correo de prueba con la configuración actual |
 | GET | `/api/admin/reports/reservations.csv` | Export CSV (filtros `from`/`to`/`status`) |
 | GET | `/api/admin/reports/monthly.csv?month=YYYY-MM` | CSV facturable del mes |
 | POST | `/api/admin/reports/monthly/send` | Envía el reporte mensual por correo |

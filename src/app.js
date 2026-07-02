@@ -18,7 +18,7 @@ import { authenticate, createSession, deleteSession } from './services/admins.js
 import { requireAdmin, setSessionCookie, clearSessionCookie } from './middleware/auth.js';
 import { createMailer } from './services/mailer.js';
 import * as notify from './services/notifications.js';
-import { getReportEmail, getAdminNotifyEmail, setSetting } from './services/settings.js';
+import { getReportEmail, setSetting, getMailConfig, EDITABLE_SETTINGS } from './services/settings.js';
 import {
   toCsv, reservationsForReport, monthlyBillable, sendMonthlyReport, previousMonth,
 } from './services/reports.js';
@@ -141,15 +141,33 @@ export function createApp(db, { mailer = createMailer(db) } = {}) {
     } catch (err) { next(err); }
   });
 
-  // Configuración (correo de reportes / aviso de nuevas reservas).
+  // Configuración de correo (transporte, remitente institucional, Graph, destinos).
   app.get('/api/admin/settings', admin, (_req, res) => {
-    res.json({ report_email: getReportEmail(db), admin_notify_email: getAdminNotifyEmail(db) });
+    res.json(getMailConfig(db));
   });
 
   app.put('/api/admin/settings', admin, (req, res) => {
-    if (req.body?.report_email !== undefined) setSetting(db, 'report_email', req.body.report_email);
-    if (req.body?.admin_notify_email !== undefined) setSetting(db, 'admin_notify_email', req.body.admin_notify_email);
-    res.json({ report_email: getReportEmail(db), admin_notify_email: getAdminNotifyEmail(db) });
+    const body = req.body ?? {};
+    for (const key of EDITABLE_SETTINGS) {
+      if (body[key] !== undefined) setSetting(db, key, body[key]);
+    }
+    res.json(getMailConfig(db));
+  });
+
+  // Envía un correo de prueba con la configuración actual (valida el transporte/Graph).
+  app.post('/api/admin/mail/test', admin, async (req, res, next) => {
+    try {
+      const to = req.body?.to;
+      if (!to) return res.status(400).json({ error: 'Indica un destinatario "to".' });
+      const result = await mailer.send({
+        to,
+        subject: `Correo de prueba — Sala ${ROOM.id}`,
+        template: 'test',
+        body: '<p>Este es un <b>correo de prueba</b> del sistema de reservas de la Sala 2C-1.</p>'
+          + '<p>Si lo recibes, la configuración de envío es correcta.</p>',
+      });
+      res.json(result);
+    } catch (err) { next(err); }
   });
 
   // Reportes a finanzas.

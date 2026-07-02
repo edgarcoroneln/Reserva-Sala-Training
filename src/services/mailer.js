@@ -1,23 +1,28 @@
-// Mailer con transporte intercambiable:
+// Mailer con transporte intercambiable, configurable EN VIVO desde `settings`:
 //   - 'console' (por defecto): registra el correo en la tabla `emails` (outbox)
 //     y lo imprime en consola. Permite probar TODO localmente sin credenciales.
 //   - 'graph': además lo envía por Microsoft Graph desde el buzón institucional.
 //
-// Se selecciona con MAIL_TRANSPORT=console|graph.
+// El transporte y el remitente se leen en cada envío desde la configuración
+// (tabla `settings`, con respaldo en variables de entorno), así los cambios
+// hechos en el módulo de administración aplican sin reiniciar el servidor.
 
-export function createMailer(db, { transport = process.env.MAIL_TRANSPORT || 'console' } = {}) {
+import {
+  getMailTransport, getMailSender, getGraphTenantId, getGraphClientId, getGraphClientSecret,
+} from './settings.js';
+
+export function createMailer(db) {
   async function send({ to, subject, body, template = null, reservationId = null, attachments = [] }) {
-    if (!to) {
-      // Sin destinatario (p. ej. correo de aviso al admin no configurado): se omite.
-      return { skipped: true };
-    }
+    if (!to) return { skipped: true };
+
+    const transport = getMailTransport(db);
     const names = JSON.stringify(attachments.map((a) => a.filename));
     let status = 'logged';
     let error = null;
 
     if (transport === 'graph') {
       try {
-        await sendViaGraph({ to, subject, body, attachments });
+        await sendViaGraph(db, { to, subject, body, attachments });
         status = 'sent';
       } catch (err) {
         status = 'error';
@@ -33,20 +38,21 @@ export function createMailer(db, { transport = process.env.MAIL_TRANSPORT || 'co
        VALUES (?,?,?,?,?,?,?,?,?)`,
     ).run(to, subject, body, template, reservationId, names, status, error, new Date().toISOString());
 
-    return { status, error };
+    return { status, error, transport };
   }
 
-  return { send, transport };
+  return {
+    send,
+    get transport() { return getMailTransport(db); },
+  };
 }
 
 // --- Microsoft Graph (client credentials) ------------------------------------
-// Requiere: GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, GRAPH_SENDER.
 
-async function graphToken() {
-  const tenant = process.env.GRAPH_TENANT_ID;
+async function graphToken(tenant, clientId, clientSecret) {
   const params = new URLSearchParams({
-    client_id: process.env.GRAPH_CLIENT_ID,
-    client_secret: process.env.GRAPH_CLIENT_SECRET,
+    client_id: clientId,
+    client_secret: clientSecret,
     scope: 'https://graph.microsoft.com/.default',
     grant_type: 'client_credentials',
   });
@@ -59,9 +65,18 @@ async function graphToken() {
   return (await res.json()).access_token;
 }
 
-async function sendViaGraph({ to, subject, body, attachments }) {
-  const sender = process.env.GRAPH_SENDER;
-  const token = await graphToken();
+async function sendViaGraph(db, { to, subject, body, attachments }) {
+  const sender = getMailSender(db);
+  const tenant = getGraphTenantId(db);
+  const clientId = getGraphClientId(db);
+  const clientSecret = getGraphClientSecret();
+
+  // Guarda: sin credenciales completas no intentamos llamar a la red.
+  if (!sender || !tenant || !clientId || !clientSecret) {
+    throw new Error('Faltan credenciales de Microsoft Graph: define remitente, Tenant ID, Client ID y GRAPH_CLIENT_SECRET (.env).');
+  }
+
+  const token = await graphToken(tenant, clientId, clientSecret);
   const message = {
     subject,
     body: { contentType: 'HTML', content: body },

@@ -172,6 +172,9 @@ button[type="submit"]:hover, #lookupBtn:hover { background: var(--teal-dark); }
 .report-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: flex-end; margin-top: 0.6rem; }
 .report-actions label { margin: 0; }
 .report-actions a.btn-secondary { text-decoration: none; display: inline-block; }
+.graph-block { margin-top: 0.6rem; border: 1px solid var(--line); border-radius: 6px; padding: 0.4rem 0.7rem; }
+.graph-block summary { cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+select#mailTransport { width: 100%; margin-top: 0.25rem; padding: 0.5rem; border: 1px solid var(--line); border-radius: 6px; font: inherit; background: #fff; }
 
 @media (max-width: 760px) {
   .layout { grid-template-columns: 1fr; }

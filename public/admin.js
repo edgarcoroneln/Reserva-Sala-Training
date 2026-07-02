@@ -36,9 +36,16 @@ function prevMonthValue() {
 
 async function loadSettings() {
   const { ok, data } = await api('/api/admin/settings');
-  if (ok) $('#reportEmail').value = data.report_email || '';
-  const month = prevMonthValue();
-  $('#reportMonth').value = month;
+  if (ok) {
+    $('#mailTransport').value = data.mail_transport || 'console';
+    $('#mailSender').value = data.mail_sender || '';
+    $('#adminNotifyEmail').value = data.admin_notify_email || '';
+    $('#reportEmail').value = data.report_email || '';
+    $('#graphTenant').value = data.graph_tenant_id || '';
+    $('#graphClient').value = data.graph_client_id || '';
+    $('#secretState').textContent = data.has_graph_secret ? 'configurado ✓' : 'no configurado (falta en .env)';
+  }
+  $('#reportMonth').value = prevMonthValue();
   updateMonthlyLink();
 }
 
@@ -47,16 +54,52 @@ function updateMonthlyLink() {
   $('#downloadMonthly').href = `/api/admin/reports/monthly.csv?month=${month}`;
 }
 
-async function saveReportEmail() {
-  const report_email = $('#reportEmail').value.trim();
-  const msg = $('#reportMsg');
+async function saveMailSettings() {
+  const msg = $('#mailMsg');
+  const payload = {
+    mail_transport: $('#mailTransport').value,
+    mail_sender: $('#mailSender').value.trim(),
+    admin_notify_email: $('#adminNotifyEmail').value.trim(),
+    report_email: $('#reportEmail').value.trim(),
+    graph_tenant_id: $('#graphTenant').value.trim(),
+    graph_client_id: $('#graphClient').value.trim(),
+  };
   const { ok, data } = await api('/api/admin/settings', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ report_email }),
+    body: JSON.stringify(payload),
   });
   msg.className = ok ? 'msg ok' : 'msg err';
-  msg.textContent = ok ? 'Correo de reportes guardado.' : (data.error || 'No se pudo guardar.');
+  if (ok) {
+    $('#secretState').textContent = data.has_graph_secret ? 'configurado ✓' : 'no configurado (falta en .env)';
+    msg.textContent = 'Configuración de correo guardada.'
+      + (data.mail_transport === 'graph' && !data.has_graph_secret
+        ? ' ⚠️ Falta GRAPH_CLIENT_SECRET en .env para enviar por Graph.'
+        : '');
+  } else {
+    msg.textContent = data.error || 'No se pudo guardar.';
+  }
+}
+
+async function sendTestMail() {
+  const to = $('#testTo').value.trim();
+  const msg = $('#mailMsg');
+  if (!to) { msg.className = 'msg err'; msg.textContent = 'Indica un correo para la prueba.'; return; }
+  const { ok, data } = await api('/api/admin/mail/test', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ to }),
+  });
+  msg.className = ok && data.status !== 'error' ? 'msg ok' : 'msg err';
+  if (!ok) {
+    msg.textContent = data.error || 'No se pudo enviar la prueba.';
+  } else if (data.status === 'sent') {
+    msg.textContent = `✅ Correo de prueba enviado a ${to} por Microsoft Graph.`;
+  } else if (data.status === 'logged') {
+    msg.textContent = `📝 Modo local: el correo a ${to} se registró (consola/outbox), no se envió realmente. Cambia el transporte a "Microsoft Graph" para envío real.`;
+  } else {
+    msg.textContent = `⚠️ ${data.error || 'Error al enviar por Graph.'}`;
+  }
 }
 
 async function sendMonthly() {
@@ -207,7 +250,8 @@ function init() {
   $('#logoutBtn').addEventListener('click', onLogout);
   $('#refreshBtn').addEventListener('click', loadReservations);
   $('#tableWrap').addEventListener('click', onAction);
-  $('#saveEmailBtn').addEventListener('click', saveReportEmail);
+  $('#saveMailBtn').addEventListener('click', saveMailSettings);
+  $('#testMailBtn').addEventListener('click', sendTestMail);
   $('#sendMonthlyBtn').addEventListener('click', sendMonthly);
   $('#reportMonth').addEventListener('change', updateMonthlyLink);
   $('#filters').addEventListener('click', (e) => {

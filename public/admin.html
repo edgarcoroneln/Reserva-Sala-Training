@@ -51,13 +51,52 @@
       </div>
 
       <div class="card">
-        <div class="card-head"><h2>Reportes a finanzas</h2></div>
+        <div class="card-head"><h2>Configuración de correo</h2></div>
+
         <div class="row">
-          <label style="flex:2">Correo para el reporte mensual
+          <label>Transporte
+            <select id="mailTransport">
+              <option value="console">Local (consola / sin envío real)</option>
+              <option value="graph">Microsoft Graph (envío real)</option>
+            </select>
+          </label>
+          <label style="flex:2">Correo institucional remitente (De:)
+            <input type="email" id="mailSender" placeholder="sala2c1@tu-dominio.com" />
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Aviso de nuevas reservas (admin)
+            <input type="email" id="adminNotifyEmail" placeholder="admin@ejemplo.com" />
+          </label>
+          <label>Correo del reporte mensual (finanzas)
             <input type="email" id="reportEmail" placeholder="finanzas@ejemplo.com" />
           </label>
-          <button type="button" id="saveEmailBtn" class="btn-secondary" style="align-self:flex-end">Guardar</button>
         </div>
+
+        <details class="graph-block">
+          <summary>Credenciales de Microsoft Graph</summary>
+          <div class="row">
+            <label>Tenant ID <input type="text" id="graphTenant" placeholder="00000000-0000-..." /></label>
+            <label>Client ID <input type="text" id="graphClient" placeholder="00000000-0000-..." /></label>
+          </div>
+          <p class="hint">
+            Client Secret: <b id="secretState">—</b>. Por seguridad, el secreto se define solo en la
+            variable de entorno <code>GRAPH_CLIENT_SECRET</code> del servidor (archivo <code>.env</code>),
+            no desde esta pantalla.
+          </p>
+        </details>
+
+        <div class="report-actions">
+          <button type="button" id="saveMailBtn">Guardar configuración</button>
+          <input type="email" id="testTo" placeholder="correo para prueba" />
+          <button type="button" id="testMailBtn" class="btn-secondary">Enviar correo de prueba</button>
+        </div>
+        <p id="mailMsg" class="msg" role="status"></p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Reportes a finanzas</h2></div>
         <div class="report-actions">
           <label>Mes <input type="month" id="reportMonth" /></label>
           <a id="downloadMonthly" class="btn-secondary" href="#">Descargar CSV del mes</a>
@@ -65,7 +104,7 @@
           <a id="downloadAll" class="btn-secondary" href="/api/admin/reports/reservations.csv">Descargar todas (CSV)</a>
         </div>
         <p id="reportMsg" class="msg" role="status"></p>
-        <p class="hint">El reporte mensual (External confirmadas) también se envía automáticamente al inicio de cada mes.</p>
+        <p class="hint">El reporte mensual (External confirmadas) también se envía automáticamente al inicio de cada mes al correo configurado arriba.</p>
       </div>
     </section>
 
