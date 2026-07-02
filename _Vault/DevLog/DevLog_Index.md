@@ -1,10 +1,10 @@
 ---
-project: "{{PROJECT_NAME}}"
-developer: "{{DEVELOPER_NAME}}"
+project: "Reserva Sala de Entrenamiento 2C-1"
+developer: "Edgar Coronel"
 status: "Active"
 ---
 
-# DevLog Index — {{PROJECT_NAME}}
+# DevLog Index — Reserva Sala de Entrenamiento 2C-1
 
 > Registro cronológico de sesiones de desarrollo.
 > Una entrada por sesión significativa con IA o por decisión técnica importante.
@@ -52,8 +52,8 @@ tags: [devlog, sprint-1]
 
 | Fecha | Descripción | Agente | Archivo |
 |-------|-------------|--------|---------|
-| {{DATE}} | Inicialización del proyecto desde template | Manual | — |
-| (siguiente sesión) | (descripción) | Claude Code | [[DevLog/YYYY-MM-DD-descripcion]] |
+| 2026-07-02 | Inicialización del proyecto desde template | Manual | — |
+| 2026-07-02 | PRD y Reporte Ejecutivo de la app de reserva 2C-1 | Claude Code | [[DevLog/2026-07-02-prd-y-reporte-ejecutivo]] |
 
 ---
 

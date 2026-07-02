@@ -1,11 +1,11 @@
-# CLAUDE.md — {{PROJECT_NAME}}
+# CLAUDE.md — Reserva Sala de Entrenamiento 2C-1
 
 ## Project Context
-- **Project:** {{PROJECT_NAME}} — {{DESCRIPTION}}
-- **Stack:** {{STACK}}
-- **Repo:** {{REPO_URL}}
-- **Developer:** {{DEVELOPER_NAME}}
-- **Type:** {{PROJECT_TYPE}} (web-app | api | mobile | script)
+- **Project:** Reserva Sala de Entrenamiento 2C-1 — App web que reemplaza el Microsoft Form para reservar la sala de entrenamientos 2C-1 de DISW (2 Patios, CDMX), con validación de disponibilidad, costo de renta y reportes a finanzas.
+- **Stack:** Frontend HTML + JavaScript · Backend Node.js + Express · BD SQLite → PostgreSQL · Integración Microsoft 365 (Graph: correo institucional + calendario Outlook de la sala)
+- **Repo:** https://github.com/edgarcoroneln/reserva-sala-training
+- **Developer:** Edgar Coronel (edgar.coronel@gmail.com)
+- **Type:** web-app
 
 ## AI Governance Rules
 
