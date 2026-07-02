@@ -49,6 +49,24 @@
         </div>
         <div id="tableWrap" class="table-wrap"></div>
       </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Reportes a finanzas</h2></div>
+        <div class="row">
+          <label style="flex:2">Correo para el reporte mensual
+            <input type="email" id="reportEmail" placeholder="finanzas@ejemplo.com" />
+          </label>
+          <button type="button" id="saveEmailBtn" class="btn-secondary" style="align-self:flex-end">Guardar</button>
+        </div>
+        <div class="report-actions">
+          <label>Mes <input type="month" id="reportMonth" /></label>
+          <a id="downloadMonthly" class="btn-secondary" href="#">Descargar CSV del mes</a>
+          <button type="button" id="sendMonthlyBtn" class="btn-secondary">Enviar por correo</button>
+          <a id="downloadAll" class="btn-secondary" href="/api/admin/reports/reservations.csv">Descargar todas (CSV)</a>
+        </div>
+        <p id="reportMsg" class="msg" role="status"></p>
+        <p class="hint">El reporte mensual (External confirmadas) también se envía automáticamente al inicio de cada mes.</p>
+      </div>
     </section>
 
     <script src="/admin.js"></script>

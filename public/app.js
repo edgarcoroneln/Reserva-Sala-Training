@@ -215,7 +215,30 @@ async function onLookup() {
     ['Tipo', r.rental_type === 'external' ? 'External' : 'Internal (DISW)'],
     ['Costo', r.rental_type === 'external' ? `${r.cost_usd} USD` : 'Sin costo'],
   ];
-  box.innerHTML = '<table>' + rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('') + '</table>';
+  let action = '';
+  const c = data.cancel || {};
+  if (c.cancelable) {
+    action = `<button type="button" class="btn-danger" id="cancelBtn" data-token="${r.token}">Cancelar reserva</button>`;
+  } else if (r.status === 'pending' || r.status === 'confirmed') {
+    action = `<p class="hint">La cancelación en línea requiere al menos ${c.min_required} días hábiles de anticipación (disponibles: ${c.business_days}). Contacta al administrador para cancelar.</p>`;
+  }
+  box.innerHTML =
+    '<table>' + rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('') + '</table>' + action;
+
+  const btn = $('#cancelBtn');
+  if (btn) btn.addEventListener('click', () => doCancel(btn.dataset.token));
+}
+
+async function doCancel(token) {
+  if (!confirm('¿Seguro que deseas cancelar esta reserva? Se liberará el horario.')) return;
+  const { ok, data } = await api(`/api/reservations/${encodeURIComponent(token)}/cancel`, { method: 'POST' });
+  const box = $('#lookupResult');
+  if (!ok) {
+    box.insertAdjacentHTML('beforeend', `<p class="msg err">${data.error || 'No se pudo cancelar.'}</p>`);
+    return;
+  }
+  onLookup();
+  renderCalendar();
 }
 
 // ---- Init -------------------------------------------------------------------
@@ -237,6 +260,14 @@ function init() {
   loadConfig();
   renderCalendar();
   syncConditionalFields();
+
+  // Si llegan con ?token=... (enlace del correo), consulta la reserva al vuelo.
+  const token = new URLSearchParams(location.search).get('token');
+  if (token) {
+    $('#tokenInput').value = token;
+    onLookup();
+    $('#lookupResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);

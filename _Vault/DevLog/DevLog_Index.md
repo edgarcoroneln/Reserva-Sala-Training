@@ -57,6 +57,7 @@ tags: [devlog, sprint-1]
 | 2026-07-02 | Ajuste de la regla de cancelación (≥ 1 semana / 5 días hábiles) | Claude Code | [[DevLog/2026-07-02-ajuste-regla-cancelacion]] |
 | 2026-07-02 | MVP Rebanada 1 — reserva + disponibilidad + anti-solapamiento | Claude Code | [[DevLog/2026-07-02-mvp-rebanada-1]] |
 | 2026-07-02 | MVP Rebanada 2 — módulo de administración (auth + estados) | Claude Code | [[DevLog/2026-07-02-mvp-rebanada-2-admin]] |
+| 2026-07-02 | MVP Rebanadas 4–5 — correo, cancelación autoservicio, reportes | Claude Code | [[DevLog/2026-07-02-mvp-rebanadas-4-5]] |
 
 ---
 

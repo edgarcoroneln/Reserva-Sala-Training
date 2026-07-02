@@ -11,20 +11,21 @@ updated: "2026-07-02"
 reporte a finanzas — reemplazando el Microsoft Form.
 
 ### Features incluidas:
-- [ ] Formulario de reserva (13 preguntas) con lógica Internal(DISW)/External
-- [ ] Calendario de disponibilidad por bloques AM/PM + validación de solapamiento
-- [ ] Cálculo de costo (300/día, 150/medio día) para External
-- [ ] Flujo Pendiente → Confirmada/Rechazada → Cancelada con validación del admin
-- [ ] Notificaciones por correo institucional (Graph) + .ics en confirmación
-- [ ] Cancelación autoservicio (≥ 5 días hábiles / 1 semana, festivos MX) por enlace único
-- [ ] Módulo de administración con login (cola, calendario, configuración, admins)
-- [ ] Export on-demand + reporte mensual automático al correo designado
-- [ ] Bitácora de auditoría
-- [ ] Modelo de datos multi-sala (aunque solo opere 2C-1)
+- [x] Formulario de reserva (13 preguntas) con lógica Internal(DISW)/External
+- [x] Calendario de disponibilidad por bloques AM/PM + validación de solapamiento
+- [x] Cálculo de costo (300/día, 150/medio día) para External
+- [x] Flujo Pendiente → Confirmada/Rechazada → Cancelada con validación del admin
+- [x] Notificaciones por correo (transporte console/Graph) + .ics en confirmación
+- [x] Cancelación autoservicio (≥ 5 días hábiles / 1 semana, festivos MX) por enlace único
+- [x] Módulo de administración con login (cola, configuración, reportes)
+- [x] Export on-demand + reporte mensual automático al correo designado
+- [x] Bitácora de auditoría
+- [x] Modelo de datos multi-sala (aunque solo opere 2C-1)
 
 ### Gate de entrega:
-- [ ] Happy path completo funciona en producción
-- [ ] URL pública accesible (HTTPS)
+- [x] Happy path completo funciona en local (47 pruebas en verde)
+- [ ] URL pública accesible (HTTPS) — pendiente de despliegue
+- [ ] Envío real de correo (credenciales Microsoft Graph) — pendiente de buzón institucional
 - [ ] Tests pasando en CI
 
 ---

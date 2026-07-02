@@ -1,6 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { ROOM } from './config.js';
 import { seedDefaultAdmin } from './services/admins.js';
+import { seedHolidays } from './services/holidays.js';
 
 // Crea (o abre) la base de datos SQLite, aplica el esquema y siembra la sala 2C-1.
 // Usar ':memory:' para pruebas. En el futuro esta capa se sustituye por PostgreSQL
@@ -88,6 +89,33 @@ function migrate(db) {
       detail     TEXT,
       created_at TEXT NOT NULL
     );
+
+    -- Festivos oficiales de México para el cálculo de días hábiles.
+    CREATE TABLE IF NOT EXISTS holidays (
+      date        TEXT PRIMARY KEY,   -- YYYY-MM-DD
+      description TEXT NOT NULL
+    );
+
+    -- Bandeja de salida de correos (outbox). El transporte 'console' registra
+    -- aquí lo que se enviaría; 'graph' además lo envía por Microsoft Graph.
+    CREATE TABLE IF NOT EXISTS emails (
+      id             INTEGER PRIMARY KEY AUTOINCREMENT,
+      to_addr        TEXT NOT NULL,
+      subject        TEXT NOT NULL,
+      body           TEXT,
+      template       TEXT,
+      reservation_id INTEGER,
+      attachments    TEXT,            -- nombres de adjuntos (JSON)
+      status         TEXT NOT NULL,   -- 'logged' | 'sent' | 'error'
+      error          TEXT,
+      created_at     TEXT NOT NULL
+    );
+
+    -- Configuración editable (correo de reportes, etc.).
+    CREATE TABLE IF NOT EXISTS settings (
+      key   TEXT PRIMARY KEY,
+      value TEXT
+    );
   `);
 
   // Migración suave: agrega columnas nuevas a BD creadas por versiones previas.
@@ -109,6 +137,8 @@ function seed(db, { quiet = false } = {}) {
     db.prepare('INSERT INTO rooms (id, name, site) VALUES (?, ?, ?)')
       .run(ROOM.id, ROOM.name, ROOM.site);
   }
+
+  seedHolidays(db);
 
   const seeded = seedDefaultAdmin(db);
   if (!quiet && seeded?.usingDefaultPassword) {

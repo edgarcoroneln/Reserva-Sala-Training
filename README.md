@@ -5,7 +5,7 @@ App web que reemplaza el Microsoft Form para reservar la sala de entrenamientos 
 ajenas a DISW y da seguimiento por token. Documentación completa en [`_Vault/01_Product/PRD.md`](_Vault/01_Product/PRD.md).
 
 - **Stack:** HTML + JavaScript · Node.js + Express · SQLite (→ PostgreSQL) · (integración Microsoft Graph pendiente)
-- **Estado:** Rebanadas 1–2 del MVP — reserva + disponibilidad + anti-solapamiento + **módulo de administración**.
+- **Estado:** MVP completo (rebanadas 1–5) — reserva, disponibilidad, administración, **notificaciones por correo**, **cancelación autoservicio** y **reportes a finanzas**.
 
 ## Cómo correr la app (MVP)
 
@@ -18,8 +18,13 @@ npm test           # corre la suite de pruebas (node --test)
 npm run dev        # modo watch para desarrollo
 ```
 
-Variables de entorno opcionales: `PORT` (default 3000), `DB_PATH` (default `./data/reservas.db`),
-`ADMIN_USER` / `ADMIN_PASSWORD` (credenciales del admin inicial).
+Variables de entorno (ver [`.env.example`](.env.example)): `PORT`, `DB_PATH`,
+`ADMIN_USER` / `ADMIN_PASSWORD` (admin inicial), `REPORT_EMAIL` / `ADMIN_NOTIFY_EMAIL` (correos),
+`MAIL_TRANSPORT` (`console` por defecto o `graph`) y las `GRAPH_*` para Microsoft Graph.
+
+> **Correo local sin credenciales:** con `MAIL_TRANSPORT=console` (default) los correos NO se envían;
+> se registran en la tabla `emails` y en la consola, así puedes probar todo el flujo sin Microsoft
+> Graph. Para envío real, define `MAIL_TRANSPORT=graph` y las variables `GRAPH_*`.
 
 ### Módulo de administración
 
@@ -36,7 +41,8 @@ Variables de entorno opcionales: `PORT` (default 3000), `DB_PATH` (default `./da
 | GET | `/api/room` | Datos de la sala y tarifas/turnos |
 | GET | `/api/availability?from=YYYY-MM-DD&to=YYYY-MM-DD` | Bloques ocupados en el rango |
 | POST | `/api/reservations` | Crea una pre-reserva (201 / 400 / 409) |
-| GET | `/api/reservations/:token` | Consulta una reserva por su token |
+| GET | `/api/reservations/:token` | Consulta una reserva + elegibilidad de cancelación |
+| POST | `/api/reservations/:token/cancel` | Cancelación autoservicio (≥ 5 días hábiles / 1 semana) |
 
 **Administración** (requieren sesión)
 
@@ -45,13 +51,17 @@ Variables de entorno opcionales: `PORT` (default 3000), `DB_PATH` (default `./da
 | POST | `/api/admin/login` · `/api/admin/logout` | Inicia / cierra sesión |
 | GET | `/api/admin/me` | Admin de la sesión actual |
 | GET | `/api/admin/reservations?status=` | Listado + conteos por estado |
-| POST | `/api/admin/reservations/:id/confirm` | Confirma una pendiente |
-| POST | `/api/admin/reservations/:id/reject` | Rechaza (con motivo) y libera calendario |
-| POST | `/api/admin/reservations/:id/cancel` | Cancela una confirmada y libera calendario |
+| POST | `/api/admin/reservations/:id/confirm` | Confirma una pendiente (notifica) |
+| POST | `/api/admin/reservations/:id/reject` | Rechaza (con motivo), libera calendario y notifica |
+| POST | `/api/admin/reservations/:id/cancel` | Cancela una confirmada, libera calendario y notifica |
+| GET · PUT | `/api/admin/settings` | Lee / actualiza el correo de reportes y de avisos |
+| GET | `/api/admin/reports/reservations.csv` | Export CSV (filtros `from`/`to`/`status`) |
+| GET | `/api/admin/reports/monthly.csv?month=YYYY-MM` | CSV facturable del mes |
+| POST | `/api/admin/reports/monthly/send` | Envía el reporte mensual por correo |
 
-> **Siguientes rebanadas:** notificaciones por correo (Microsoft Graph), cancelación autoservicio
-> del usuario (regla de 1 semana) y reportes a finanzas.
-> Ver [`_Vault/07_Roadmap/Roadmap.md`](_Vault/07_Roadmap/Roadmap.md).
+El **reporte mensual** (External confirmadas) se envía **automáticamente** al inicio de cada mes al
+`REPORT_EMAIL` configurado. Documentación funcional completa en
+[`_Vault/01_Product/PRD.md`](_Vault/01_Product/PRD.md).
 
 ---
 

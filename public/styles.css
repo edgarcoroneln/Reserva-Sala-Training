@@ -169,6 +169,10 @@ button[type="submit"]:hover, #lookupBtn:hover { background: var(--teal-dark); }
 .admin-link { color: #fff; opacity: 0.9; font-size: 0.82rem; text-decoration: none; border: 1px solid rgba(255,255,255,0.5); padding: 3px 10px; border-radius: 6px; }
 .admin-link:hover { opacity: 1; background: rgba(255,255,255,0.12); }
 
+.report-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: flex-end; margin-top: 0.6rem; }
+.report-actions label { margin: 0; }
+.report-actions a.btn-secondary { text-decoration: none; display: inline-block; }
+
 @media (max-width: 760px) {
   .layout { grid-template-columns: 1fr; }
   .row { flex-direction: column; }

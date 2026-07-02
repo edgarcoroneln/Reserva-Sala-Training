@@ -23,15 +23,16 @@ base para construir el MVP de la app de reserva de la sala 2C-1.
 - [x] Documentación del Vault coherente (índice, historias, arquitectura, riesgos, roadmap)
 - [x] **MVP Rebanada 1** — reserva + disponibilidad AM/PM + anti-solapamiento (backend + frontend + pruebas)
 - [x] **MVP Rebanada 2** — módulo de administración: login, cola de validación, confirmar/rechazar/cancelar, auditoría
-- [ ] Rebanada 4 — notificaciones por correo (Microsoft Graph)
-- [ ] Rebanada 5 — cancelación autoservicio (regla 1 semana) + reportes a finanzas
+- [x] **MVP Rebanada 4** — notificaciones por correo (transporte console/Graph, .ics)
+- [x] **MVP Rebanada 5** — cancelación autoservicio (regla 1 semana + festivos MX) + reportes a finanzas
 
 ---
 
 ## Tarea activa HOY
 
-**Estoy trabajando en:** MVP Rebanadas 1–2 terminadas (API + frontend + admin + 30 pruebas en verde).
-Siguiente: Rebanada 4 (notificaciones vía Graph) o Rebanada 5 (cancelación autoservicio + reportes).
+**Estoy trabajando en:** **MVP completo (rebanadas 1–5)** — 47 pruebas en verde, verificado por
+navegador y curl. Pendiente: credenciales de Microsoft Graph para envío real de correo, y Fases 2–3
+(multi-sala, SSO) del Roadmap.
 
 **Archivos que voy a tocar:**
 - `src/` (backend Express + servicios)

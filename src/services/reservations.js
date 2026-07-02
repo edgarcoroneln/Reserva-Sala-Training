@@ -1,7 +1,8 @@
 import crypto from 'node:crypto';
-import { ROOM, OCCUPYING_STATUSES } from '../config.js';
-import { ValidationError, ConflictError, NotFoundError } from '../errors.js';
+import { ROOM, OCCUPYING_STATUSES, CANCEL_MIN_BUSINESS_DAYS } from '../config.js';
+import { ValidationError, ConflictError, NotFoundError, ForbiddenError } from '../errors.js';
 import { computeBlocks, computeCost, isBlockOccupied } from './availability.js';
+import { getHolidaySet, businessDaysBetween, todayISO } from './holidays.js';
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -161,6 +162,48 @@ export function rejectReservation(db, id, adminId, reason) {
   }
   auditLog(db, adminId, 'reject', 'reservation', id, reason ? String(reason).trim() : null);
   return getById(db, id);
+}
+
+// Evalúa si una reserva puede cancelarse por autoservicio (regla ≥ N días hábiles).
+export function cancelEligibility(db, r, today = todayISO()) {
+  if (!OCCUPYING_STATUSES.includes(r.status)) {
+    return { cancelable: false, business_days: 0, min_required: CANCEL_MIN_BUSINESS_DAYS, status: r.status };
+  }
+  const days = businessDaysBetween(today, r.start_date, getHolidaySet(db));
+  return {
+    cancelable: days >= CANCEL_MIN_BUSINESS_DAYS,
+    business_days: days,
+    min_required: CANCEL_MIN_BUSINESS_DAYS,
+    status: r.status,
+  };
+}
+
+// Cancelación autoservicio del solicitante (por token), con la regla de 1 semana.
+export function selfCancelByToken(db, token, today = todayISO()) {
+  const r = getByToken(db, token);
+  if (!r) throw new NotFoundError('Reserva no encontrada.');
+  if (!OCCUPYING_STATUSES.includes(r.status)) {
+    throw new ValidationError(`Esta reserva no se puede cancelar (estado actual: ${r.status}).`);
+  }
+  const { cancelable, business_days } = cancelEligibility(db, r, today);
+  if (!cancelable) {
+    throw new ForbiddenError(
+      `La cancelación en línea requiere al menos ${CANCEL_MIN_BUSINESS_DAYS} días hábiles de anticipación ` +
+        `(disponibles: ${business_days}). Contacta al administrador para cancelar.`,
+    );
+  }
+  db.exec('BEGIN');
+  try {
+    db.prepare('UPDATE reservations SET status=?, rejected_reason=?, decided_at=? WHERE id=?')
+      .run('cancelled', 'Cancelación autoservicio', new Date().toISOString(), r.id);
+    freeBlocks(db, r.id);
+    db.exec('COMMIT');
+  } catch (err) {
+    db.exec('ROLLBACK');
+    throw err;
+  }
+  auditLog(db, null, 'self_cancel', 'reservation', r.id);
+  return getById(db, r.id);
 }
 
 // Cancela una reserva activa (pendiente o confirmada) y libera el calendario.

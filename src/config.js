@@ -25,3 +25,7 @@ export const DURATION_TYPES = ['half', 'complete'];
 
 // Estados de la reserva que ocupan el calendario (bloquean disponibilidad).
 export const OCCUPYING_STATUSES = ['pending', 'confirmed'];
+
+// Anticipación mínima (en días hábiles) para que el usuario cancele por
+// autoservicio: 1 semana = 5 días laborales (ver PRD §5 / Anexo E).
+export const CANCEL_MIN_BUSINESS_DAYS = 5;

@@ -25,6 +25,52 @@ function showDash(username) {
   $('#dashView').classList.remove('hidden');
   $('#whoami').textContent = `Sesión: ${username}`;
   loadReservations();
+  loadSettings();
+}
+
+function prevMonthValue() {
+  const now = new Date();
+  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+}
+
+async function loadSettings() {
+  const { ok, data } = await api('/api/admin/settings');
+  if (ok) $('#reportEmail').value = data.report_email || '';
+  const month = prevMonthValue();
+  $('#reportMonth').value = month;
+  updateMonthlyLink();
+}
+
+function updateMonthlyLink() {
+  const month = $('#reportMonth').value || prevMonthValue();
+  $('#downloadMonthly').href = `/api/admin/reports/monthly.csv?month=${month}`;
+}
+
+async function saveReportEmail() {
+  const report_email = $('#reportEmail').value.trim();
+  const msg = $('#reportMsg');
+  const { ok, data } = await api('/api/admin/settings', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ report_email }),
+  });
+  msg.className = ok ? 'msg ok' : 'msg err';
+  msg.textContent = ok ? 'Correo de reportes guardado.' : (data.error || 'No se pudo guardar.');
+}
+
+async function sendMonthly() {
+  const month = $('#reportMonth').value || prevMonthValue();
+  const msg = $('#reportMsg');
+  const { ok, data } = await api('/api/admin/reports/monthly/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ month }),
+  });
+  msg.className = ok ? 'msg ok' : 'msg err';
+  msg.textContent = ok
+    ? `Reporte de ${data.month} enviado a ${data.to} (${data.count} reservas, ${data.total} USD).`
+    : (data.error || 'No se pudo enviar.');
 }
 
 async function checkSession() {
@@ -161,6 +207,9 @@ function init() {
   $('#logoutBtn').addEventListener('click', onLogout);
   $('#refreshBtn').addEventListener('click', loadReservations);
   $('#tableWrap').addEventListener('click', onAction);
+  $('#saveEmailBtn').addEventListener('click', saveReportEmail);
+  $('#sendMonthlyBtn').addEventListener('click', sendMonthly);
+  $('#reportMonth').addEventListener('change', updateMonthlyLink);
   $('#filters').addEventListener('click', (e) => {
     const btn = e.target.closest('.filter');
     if (!btn) return;

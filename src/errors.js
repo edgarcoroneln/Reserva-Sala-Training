@@ -33,3 +33,11 @@ export class AuthError extends Error {
     this.status = 401;
   }
 }
+
+export class ForbiddenError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'ForbiddenError';
+    this.status = 403;
+  }
+}
