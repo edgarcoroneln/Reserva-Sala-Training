@@ -22,14 +22,16 @@ base para construir el MVP de la app de reserva de la sala 2C-1.
 - [x] Reporte Ejecutivo escrito en [[01_Product/Reporte_Ejecutivo]]
 - [x] Documentación del Vault coherente (índice, historias, arquitectura, riesgos, roadmap)
 - [x] **MVP Rebanada 1** — reserva + disponibilidad AM/PM + anti-solapamiento (backend + frontend + pruebas)
-- [ ] Rebanada 2 — estados Confirmada/Rechazada y validación DISW/ARE
+- [x] **MVP Rebanada 2** — módulo de administración: login, cola de validación, confirmar/rechazar/cancelar, auditoría
+- [ ] Rebanada 4 — notificaciones por correo (Microsoft Graph)
+- [ ] Rebanada 5 — cancelación autoservicio (regla 1 semana) + reportes a finanzas
 
 ---
 
 ## Tarea activa HOY
 
-**Estoy trabajando en:** MVP Rebanada 1 terminada (API + frontend + 19 pruebas en verde).
-Siguiente: Rebanada 2 (estados y módulo admin).
+**Estoy trabajando en:** MVP Rebanadas 1–2 terminadas (API + frontend + admin + 30 pruebas en verde).
+Siguiente: Rebanada 4 (notificaciones vía Graph) o Rebanada 5 (cancelación autoservicio + reportes).
 
 **Archivos que voy a tocar:**
 - `src/` (backend Express + servicios)

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Administración — Sala 2C-1</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Administración — Sala 2C-1</h1>
+      <p class="subtitle">Validación de reservas · reportes · configuración</p>
+    </header>
+
+    <!-- Login -->
+    <section id="loginView" class="card lookup hidden" aria-labelledby="login-title">
+      <div class="card-head"><h2 id="login-title">Iniciar sesión</h2></div>
+      <form id="loginForm">
+        <label>Usuario
+          <input type="text" name="username" autocomplete="username" required />
+        </label>
+        <label>Contraseña
+          <input type="password" name="password" autocomplete="current-password" required />
+        </label>
+        <button type="submit">Entrar</button>
+        <p id="loginMsg" class="msg" role="status"></p>
+      </form>
+    </section>
+
+    <!-- Tablero -->
+    <section id="dashView" class="hidden">
+      <div class="admin-bar">
+        <div id="counts" class="counts"></div>
+        <div class="admin-user">
+          <span id="whoami" class="muted"></span>
+          <button type="button" id="refreshBtn" class="btn-secondary">Actualizar</button>
+          <button type="button" id="logoutBtn" class="btn-secondary">Salir</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="filters" id="filters">
+          <button type="button" class="filter active" data-status="pending">Pendientes</button>
+          <button type="button" class="filter" data-status="confirmed">Confirmadas</button>
+          <button type="button" class="filter" data-status="rejected">Rechazadas</button>
+          <button type="button" class="filter" data-status="cancelled">Canceladas</button>
+          <button type="button" class="filter" data-status="">Todas</button>
+        </div>
+        <div id="tableWrap" class="table-wrap"></div>
+      </div>
+    </section>
+
+    <script src="/admin.js"></script>
+  </body>
+</html>

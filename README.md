@@ -5,7 +5,7 @@ App web que reemplaza el Microsoft Form para reservar la sala de entrenamientos 
 ajenas a DISW y da seguimiento por token. Documentación completa en [`_Vault/01_Product/PRD.md`](_Vault/01_Product/PRD.md).
 
 - **Stack:** HTML + JavaScript · Node.js + Express · SQLite (→ PostgreSQL) · (integración Microsoft Graph pendiente)
-- **Estado:** Rebanada 1 del MVP — reserva + disponibilidad + anti-solapamiento.
+- **Estado:** Rebanadas 1–2 del MVP — reserva + disponibilidad + anti-solapamiento + **módulo de administración**.
 
 ## Cómo correr la app (MVP)
 
@@ -18,9 +18,18 @@ npm test           # corre la suite de pruebas (node --test)
 npm run dev        # modo watch para desarrollo
 ```
 
-Variables de entorno opcionales: `PORT` (default 3000), `DB_PATH` (default `./data/reservas.db`).
+Variables de entorno opcionales: `PORT` (default 3000), `DB_PATH` (default `./data/reservas.db`),
+`ADMIN_USER` / `ADMIN_PASSWORD` (credenciales del admin inicial).
 
-### Endpoints (Rebanada 1)
+### Módulo de administración
+
+- URL: **http://localhost:3000/admin.html** (enlace "Administración" en la esquina superior de la app).
+- Al primer arranque se crea un admin por defecto: **usuario `admin` / contraseña `admin123`**
+  (cámbialo con `ADMIN_USER` / `ADMIN_PASSWORD`). La sesión usa cookie httpOnly.
+
+### Endpoints
+
+**Públicos**
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
@@ -29,8 +38,20 @@ Variables de entorno opcionales: `PORT` (default 3000), `DB_PATH` (default `./da
 | POST | `/api/reservations` | Crea una pre-reserva (201 / 400 / 409) |
 | GET | `/api/reservations/:token` | Consulta una reserva por su token |
 
-> **Siguientes rebanadas:** estados Confirmada/Rechazada + módulo admin, notificaciones (Graph),
-> cancelación (regla de 1 semana) y reportes. Ver [`_Vault/07_Roadmap/Roadmap.md`](_Vault/07_Roadmap/Roadmap.md).
+**Administración** (requieren sesión)
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| POST | `/api/admin/login` · `/api/admin/logout` | Inicia / cierra sesión |
+| GET | `/api/admin/me` | Admin de la sesión actual |
+| GET | `/api/admin/reservations?status=` | Listado + conteos por estado |
+| POST | `/api/admin/reservations/:id/confirm` | Confirma una pendiente |
+| POST | `/api/admin/reservations/:id/reject` | Rechaza (con motivo) y libera calendario |
+| POST | `/api/admin/reservations/:id/cancel` | Cancela una confirmada y libera calendario |
+
+> **Siguientes rebanadas:** notificaciones por correo (Microsoft Graph), cancelación autoservicio
+> del usuario (regla de 1 semana) y reportes a finanzas.
+> Ver [`_Vault/07_Roadmap/Roadmap.md`](_Vault/07_Roadmap/Roadmap.md).
 
 ---
 

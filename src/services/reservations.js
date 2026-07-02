@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
-import { ROOM } from '../config.js';
-import { ValidationError, ConflictError } from '../errors.js';
+import { ROOM, OCCUPYING_STATUSES } from '../config.js';
+import { ValidationError, ConflictError, NotFoundError } from '../errors.js';
 import { computeBlocks, computeCost, isBlockOccupied } from './availability.js';
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -93,4 +93,92 @@ export function getById(db, id) {
 
 export function getByToken(db, token) {
   return db.prepare('SELECT * FROM reservations WHERE token = ?').get(token);
+}
+
+// --- Administración: listado y transiciones de estado ------------------------
+
+const VALID_STATUSES = ['pending', 'confirmed', 'rejected', 'cancelled'];
+
+export function listReservations(db, { status } = {}) {
+  if (status) {
+    if (!VALID_STATUSES.includes(status)) throw new ValidationError('Estado inválido.');
+    return db.prepare('SELECT * FROM reservations WHERE status = ? ORDER BY created_at DESC').all(status);
+  }
+  return db.prepare('SELECT * FROM reservations ORDER BY created_at DESC').all();
+}
+
+export function countByStatus(db) {
+  const rows = db.prepare('SELECT status, COUNT(*) AS n FROM reservations GROUP BY status').all();
+  const counts = { pending: 0, confirmed: 0, rejected: 0, cancelled: 0 };
+  for (const r of rows) counts[r.status] = r.n;
+  return counts;
+}
+
+function requireReservation(db, id) {
+  const r = getById(db, id);
+  if (!r) throw new NotFoundError('Reserva no encontrada.');
+  return r;
+}
+
+function freeBlocks(db, reservationId) {
+  db.prepare('DELETE FROM blocks WHERE reservation_id = ?').run(reservationId);
+}
+
+export function auditLog(db, adminId, action, entity, entityId, detail = null) {
+  db.prepare(
+    'INSERT INTO audit_log (admin_id, action, entity, entity_id, detail, created_at) VALUES (?,?,?,?,?,?)',
+  ).run(adminId ?? null, action, entity, entityId ?? null, detail, new Date().toISOString());
+}
+
+// Confirma una pre-reserva pendiente. Los bloques ya estaban reservados desde
+// la creación, así que solo cambia el estado.
+export function confirmReservation(db, id, adminId) {
+  const r = requireReservation(db, id);
+  if (r.status !== 'pending') {
+    throw new ValidationError(`Solo se puede confirmar una reserva pendiente (estado actual: ${r.status}).`);
+  }
+  db.prepare('UPDATE reservations SET status=?, decided_by=?, decided_at=? WHERE id=?')
+    .run('confirmed', adminId, new Date().toISOString(), id);
+  auditLog(db, adminId, 'confirm', 'reservation', id);
+  return getById(db, id);
+}
+
+// Rechaza una pre-reserva pendiente y libera el calendario.
+export function rejectReservation(db, id, adminId, reason) {
+  const r = requireReservation(db, id);
+  if (r.status !== 'pending') {
+    throw new ValidationError(`Solo se puede rechazar una reserva pendiente (estado actual: ${r.status}).`);
+  }
+  db.exec('BEGIN');
+  try {
+    db.prepare('UPDATE reservations SET status=?, rejected_reason=?, decided_by=?, decided_at=? WHERE id=?')
+      .run('rejected', reason ? String(reason).trim() : null, adminId, new Date().toISOString(), id);
+    freeBlocks(db, id);
+    db.exec('COMMIT');
+  } catch (err) {
+    db.exec('ROLLBACK');
+    throw err;
+  }
+  auditLog(db, adminId, 'reject', 'reservation', id, reason ? String(reason).trim() : null);
+  return getById(db, id);
+}
+
+// Cancela una reserva activa (pendiente o confirmada) y libera el calendario.
+export function cancelReservation(db, id, adminId, reason) {
+  const r = requireReservation(db, id);
+  if (!OCCUPYING_STATUSES.includes(r.status)) {
+    throw new ValidationError(`No se puede cancelar una reserva en estado "${r.status}".`);
+  }
+  db.exec('BEGIN');
+  try {
+    db.prepare('UPDATE reservations SET status=?, rejected_reason=?, decided_by=?, decided_at=? WHERE id=?')
+      .run('cancelled', reason ? String(reason).trim() : null, adminId, new Date().toISOString(), id);
+    freeBlocks(db, id);
+    db.exec('COMMIT');
+  } catch (err) {
+    db.exec('ROLLBACK');
+    throw err;
+  }
+  auditLog(db, adminId, 'cancel', 'reservation', id, reason ? String(reason).trim() : null);
+  return getById(db, id);
 }

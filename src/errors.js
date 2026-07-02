@@ -17,3 +17,19 @@ export class ConflictError extends Error {
     this.conflicts = conflicts;
   }
 }
+
+export class NotFoundError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'NotFoundError';
+    this.status = 404;
+  }
+}
+
+export class AuthError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'AuthError';
+    this.status = 401;
+  }
+}

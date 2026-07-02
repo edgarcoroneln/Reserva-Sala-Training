@@ -3,7 +3,17 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ROOM, SLOTS, SLOT_TIMES, PRICE_HALF_USD, PRICE_DAY_USD } from './config.js';
 import { getOccupiedBlocks } from './services/availability.js';
-import { createReservation, getByToken } from './services/reservations.js';
+import {
+  createReservation,
+  getByToken,
+  listReservations,
+  countByStatus,
+  confirmReservation,
+  rejectReservation,
+  cancelReservation,
+} from './services/reservations.js';
+import { authenticate, createSession, deleteSession } from './services/admins.js';
+import { requireAdmin, setSessionCookie, clearSessionCookie } from './middleware/auth.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -63,6 +73,69 @@ export function createApp(db) {
       const reservation = getByToken(db, req.params.token);
       if (!reservation) return res.status(404).json({ error: 'Reserva no encontrada.' });
       res.json({ reservation: publicView(reservation) });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // --- Módulo de administración ---------------------------------------------
+
+  const admin = requireAdmin(db);
+
+  // Login: valida credenciales, crea sesión y setea cookie httpOnly.
+  app.post('/api/admin/login', (req, res, next) => {
+    try {
+      const { username, password } = req.body ?? {};
+      const found = authenticate(db, username, password);
+      const token = createSession(db, found.id);
+      setSessionCookie(res, token);
+      res.json({ admin: { username: found.username } });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.post('/api/admin/logout', admin, (req, res) => {
+    deleteSession(db, req.sessionToken);
+    clearSessionCookie(res);
+    res.json({ ok: true });
+  });
+
+  app.get('/api/admin/me', admin, (req, res) => {
+    res.json({ admin: { username: req.admin.username } });
+  });
+
+  // Listado (con filtro opcional por estado) + conteos para el tablero.
+  app.get('/api/admin/reservations', admin, (req, res, next) => {
+    try {
+      const status = req.query.status ? String(req.query.status) : undefined;
+      res.json({ counts: countByStatus(db), reservations: listReservations(db, { status }) });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.post('/api/admin/reservations/:id/confirm', admin, (req, res, next) => {
+    try {
+      res.json({ reservation: confirmReservation(db, Number(req.params.id), req.admin.id) });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.post('/api/admin/reservations/:id/reject', admin, (req, res, next) => {
+    try {
+      const reason = req.body?.reason;
+      res.json({ reservation: rejectReservation(db, Number(req.params.id), req.admin.id, reason) });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.post('/api/admin/reservations/:id/cancel', admin, (req, res, next) => {
+    try {
+      const reason = req.body?.reason;
+      res.json({ reservation: cancelReservation(db, Number(req.params.id), req.admin.id, reason) });
     } catch (err) {
       next(err);
     }
